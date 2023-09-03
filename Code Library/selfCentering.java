@@ -36,27 +36,36 @@ public class MyFIRSTJavaOpMode extends LinearOpMode {
       telemetry.addData("Distance", (distance1.getDistance(DistanceUnit.CM)));
     //    telemetry.update();
     int i = 1;
-    do{
     forward(100);
-    i++;
-    sleep(500);
-    }while(i<=3);
+    rotateRight(200);
+    forward(200);
+    rotateRight(200);
+    sleep(100);
     
     
-    do{
+    while(checkSides(50)){
+      forward(100);
+     // if (checkSides(50) && left>right  ){forward(100);} 
+     //else {rotateLeft(400); forward(100);}
+    
+        
+    }
+    }
+    
+    public boolean checkSides(int tollerance){
       double right = ping();
       rotateRight(400);
-     // telemetry.update();
-     double left = ping();
-     if(left>right && Math.abs(left-right)<10 ){
-         forward(50);
-     } else
-     {
-         rotateLeft(400);
-         forward(100);
-     }
-    }while(Math.abs(left-right)>10);
+      sleep(200);
+      double left = ping();
+      rotateRight(400);
+      sleep(200);
+      window.alert(Math.abs(left-right)+" / L:"+left+" R:"+right);
+     // rotateLeft(400);
+      sleep(300);
+      return (Math.abs(left-right)>tollerance );
     }
+    
+    
     public void forward(int runTime){
         motorLeft.setPower(1);
         motorRight.setPower(1);
