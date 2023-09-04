@@ -16,6 +16,7 @@ public class MyFIRSTJavaOpMode extends LinearOpMode {
     ColorSensor color1;
     DistanceSensor distance1;
     BNO055IMU imu;
+    int stepPause =250;
     
 
 @Override
@@ -72,7 +73,7 @@ public class MyFIRSTJavaOpMode extends LinearOpMode {
         sleep(runTime);
         motorLeft.setPower(0);
         motorRight.setPower(0);
-        sleep(100);
+        sleep(stepPause);
       }
       
       public void backward(int runTime){
@@ -81,7 +82,7 @@ public class MyFIRSTJavaOpMode extends LinearOpMode {
         sleep(runTime);
         motorLeft.setPower(0);
         motorRight.setPower(0);
-        sleep(100);
+        sleep(stepPause);
       }
       
       public void rotateRight(int turnTime){
@@ -90,7 +91,7 @@ public class MyFIRSTJavaOpMode extends LinearOpMode {
         sleep(turnTime);
         motorLeft.setPower(0);
         motorRight.setPower(0);
-        sleep(100);
+        sleep(stepPause);
       }
       
       public void rotateLeft(int turnTime){
@@ -99,7 +100,7 @@ public class MyFIRSTJavaOpMode extends LinearOpMode {
         sleep(turnTime);
         motorLeft.setPower(0);
         motorRight.setPower(0);
-        sleep(100);
+        sleep(stepPause);
       }
       
       public void veerRight(int turnTime, double offset){
@@ -108,7 +109,7 @@ public class MyFIRSTJavaOpMode extends LinearOpMode {
               sleep(turnTime);
               motorLeft.setPower(0);
               motorRight.setPower(0);
-              sleep(100);
+              sleep(stepPause);
       }
       
       public void goUntil(int cm){
@@ -124,6 +125,7 @@ public class MyFIRSTJavaOpMode extends LinearOpMode {
                   break;
                   }
                   }
+                  sleep(stepPause);
                   
         }
       
