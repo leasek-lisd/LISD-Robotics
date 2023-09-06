@@ -5,6 +5,10 @@ DistanceSensor distance1;
 // Should be under public void runOpMode()
 color1 = hardwareMap.get(ColorSensor.class, "color1");
 distance1 = hardwareMap.get(DistanceSensor.class, "distance1");
+
+// Add at begining of code
+motorLeft.setDirection(DcMotor.Direction.REVERSE);
+
 // Add after Main method (between the last two curly brackets }
 public void forward(int runTime){
 	motorLeft.setPower(1);
