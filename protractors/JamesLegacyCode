@@ -1,0 +1,124 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+
+@TeleOp(name = "Arm and Crane")
+public class JamesNashLegacyCode extends LinearOpMode {
+
+  private DcMotor FrontRight;
+  private DcMotor backRight;
+  private DcMotor FrontLeft;
+  private DcMotor backLeft;
+  private DcMotor lift;
+  private DcMotor pully;
+  private Servo clawRight;
+  private Servo clawLeft;
+  private Servo launcher;
+ 
+
+  /**
+   * This function is executed when this Op Mode is selected from the Driver Station.
+   */
+  @Override
+  public void runOpMode() {
+    FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
+    backRight = hardwareMap.get(DcMotor.class, "backRight");
+    FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeft");
+    backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+    lift = hardwareMap.get(DcMotor.class, "liftMotor");
+    pully = hardwareMap.get(DcMotor.class, "pullyMotor");
+    clawRight = hardwareMap.get(Servo.class, "clawRight");
+    clawLeft = hardwareMap.get(Servo.class, "clawLeft");
+    launcher = hardwareMap.get(Servo.class, "launcherServo");
+    // Put initialization blocks here.
+    // You will have to determine which motor to reverse for your robot.
+    // In this example, the right motor was reversed so that positive
+    // applied power makes it move the robot in the forward direction.
+  backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+    // You will have to determine which motor to reverse for your robot.
+    // In this example, the right motor was reversed so that positive
+    // applied power makes it move the robot in the forward direction.
+  backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+  //bucket.scaleRange(-10, 10);
+   
+    waitForStart();
+    if (opModeIsActive()) {
+      // Put run blocks here.
+      while (opModeIsActive()) {
+        // Put loop blocks here.
+        telemetry.update();
+        // The Y axis of a joystick ranges from -1 in its topmost position
+        // to +1 in its bottommost position. We negate this value so that
+        // the topmost position corresponds to maximum forward power.
+        FrontLeft.setPower(-(1 * gamepad1.left_stick_y) + 1 * gamepad1.left_stick_x + 0.7 * gamepad1.right_stick_x);
+        FrontRight.setPower((-(1 * gamepad1.left_stick_y) - 1 * gamepad1.left_stick_x) + -0.7 * gamepad1.right_stick_x);
+        // The Y axis of a joystick ranges from -1 in its topmost position
+        // to +1 in its bottommost position. We negate this value so that
+        // the topmost position corresponds to maximum forward power.
+        backLeft.setPower((-(1 * gamepad1.left_stick_y) - 1 * gamepad1.left_stick_x) + 0.7 * gamepad1.right_stick_x);
+        backRight.setPower(-(1 * gamepad1.left_stick_y) + 1 * gamepad1.left_stick_x + -0.7 * gamepad1.right_stick_x);
+        if (gamepad1.dpad_right) {
+          FrontLeft.setPower(0.25);
+          FrontRight.setPower(-0.25);
+          backLeft.setPower(0.25);
+          backRight.setPower(-0.25);
+        }
+        if (gamepad1.dpad_left) {
+          FrontLeft.setPower(-0.25);
+          FrontRight.setPower(0.25);
+          backLeft.setPower(-0.25);
+          backRight.setPower(0.25);
+        }
+        if (gamepad1.dpad_up) {
+          FrontLeft.setPower(0.25);
+          FrontRight.setPower(0.25);
+          backLeft.setPower(0.25);
+          backRight.setPower(0.25);
+        }
+        if (gamepad1.dpad_down) {
+          FrontLeft.setPower(-0.25);
+          FrontRight.setPower(-0.25);
+          backLeft.setPower(-0.25);
+          backRight.setPower(-0.25);
+        }
+        //Bucket Controls
+        if (gamepad2.right_bumper) {
+          clawRight.setPosition(0.58);
+          clawLeft.setPosition(0);
+        }
+        if (gamepad2.left_bumper) {
+          clawRight.setPosition(0);
+          clawLeft.setPosition(0.48);
+        }
+        if (gamepad2.y) {
+          clawRight.setPosition(0);
+        }
+        if (gamepad2.a) {
+          clawRight.setPosition(0.48);
+        }
+        if (gamepad2.b) {
+          clawLeft.setPosition(0.48);
+        }
+        if (gamepad2.x) {
+          clawLeft.setPosition(0);
+        }
+        //Lift Controls
+        lift.setPower(gamepad2.left_stick_y);
+        pully.setPower(gamepad2.right_stick_y);
+        telemetry.addData("FLeft Pow", FrontLeft.getPower());
+        telemetry.addData("BLeft Pow", FrontLeft.getPower());
+        telemetry.addData("FRight Pow", FrontLeft.getPower());
+        telemetry.addData("BRight Pow", FrontLeft.getPower());
+        telemetry.addData("clawL Pos", clawLeft.getPosition());
+        telemetry.addData("clawR Pos", clawRight.getPosition());
+        telemetry.addData("Launcher Pos", launcher.getPosition());
+        telemetry.update();
+      }
+    }
+  }
+}
+
