@@ -1,0 +1,114 @@
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+
+@TeleOp(name = "mecanum (Blocks to Java)")
+public class PowerPlayCode extends LinearOpMode {
+
+  private DcMotor FrontRightAsDcMotor;
+  private DcMotor backRightAsDcMotor;
+  private Servo rightliftservoAsServo;
+  private DcMotor FrontLeftAsDcMotor;
+  private DcMotor backLeftAsDcMotor;
+  private DcMotor liftAsDcMotor;
+  private Servo leftclawAsServo;
+  private Servo rightclawAsServo;
+
+  /**
+   * This function is executed when this Op Mode is selected from the Driver Station.
+   */
+  @Override
+  public void runOpMode() {
+    FrontRightAsDcMotor = hardwareMap.get(DcMotor.class, "FrontRightAsDcMotor");
+    backRightAsDcMotor = hardwareMap.get(DcMotor.class, "backRightAsDcMotor");
+    rightliftservoAsServo = hardwareMap.get(Servo.class, "rightliftservoAsServo");
+    FrontLeftAsDcMotor = hardwareMap.get(DcMotor.class, "FrontLeftAsDcMotor");
+    backLeftAsDcMotor = hardwareMap.get(DcMotor.class, "backLeftAsDcMotor");
+    liftAsDcMotor = hardwareMap.get(DcMotor.class, "liftAsDcMotor");
+    leftclawAsServo = hardwareMap.get(Servo.class, "leftclawAsServo");
+    rightclawAsServo = hardwareMap.get(Servo.class, "rightclawAsServo");
+
+    // Put initialization blocks here.
+    // You will have to determine which motor to reverse for your robot.
+    // In this example, the right motor was reversed so that positive
+    // applied power makes it move the robot in the forward direction.
+    FrontRightAsDcMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    // You will have to determine which motor to reverse for your robot.
+    // In this example, the right motor was reversed so that positive
+    // applied power makes it move the robot in the forward direction.
+    backRightAsDcMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    rightliftservoAsServo.scaleRange(0.2, 0.8);
+    waitForStart();
+    if (opModeIsActive()) {
+      // Put run blocks here.
+      while (opModeIsActive()) {
+        // Put loop blocks here.
+        telemetry.update();
+        // The Y axis of a joystick ranges from -1 in its topmost position
+        // to +1 in its bottommost position. We negate this value so that
+        // the topmost position corresponds to maximum forward power.
+        FrontLeftAsDcMotor.setPower(-(1 * gamepad1.left_stick_y) + 1 * gamepad1.left_stick_x + 0.7 * gamepad1.right_stick_x);
+        FrontRightAsDcMotor.setPower((-(1 * gamepad1.left_stick_y) - 1 * gamepad1.left_stick_x) + -0.7 * gamepad1.right_stick_x);
+        // The Y axis of a joystick ranges from -1 in its topmost position
+        // to +1 in its bottommost position. We negate this value so that
+        // the topmost position corresponds to maximum forward power.
+        backLeftAsDcMotor.setPower((-(1 * gamepad1.left_stick_y) - 1 * gamepad1.left_stick_x) + 0.7 * gamepad1.right_stick_x);
+        backRightAsDcMotor.setPower(-(1 * gamepad1.left_stick_y) + 1 * gamepad1.left_stick_x + -0.7 * gamepad1.right_stick_x);
+        if (gamepad1.dpad_right) {
+          FrontLeftAsDcMotor.setPower(0.25);
+          FrontRightAsDcMotor.setPower(-0.25);
+          backLeftAsDcMotor.setPower(0.25);
+          backRightAsDcMotor.setPower(-0.25);
+        }
+        if (gamepad1.dpad_left) {
+          FrontLeftAsDcMotor.setPower(-0.25);
+          FrontRightAsDcMotor.setPower(0.25);
+          backLeftAsDcMotor.setPower(-0.25);
+          backRightAsDcMotor.setPower(0.25);
+        }
+        if (gamepad1.dpad_up) {
+          FrontLeftAsDcMotor.setPower(0.25);
+          FrontRightAsDcMotor.setPower(0.25);
+          backLeftAsDcMotor.setPower(0.25);
+          backRightAsDcMotor.setPower(0.25);
+        }
+        if (gamepad1.dpad_down) {
+          FrontLeftAsDcMotor.setPower(-0.25);
+          FrontRightAsDcMotor.setPower(-0.25);
+          backLeftAsDcMotor.setPower(-0.25);
+          backRightAsDcMotor.setPower(-0.25);
+        }
+        liftAsDcMotor.setPower(gamepad2.left_stick_y);
+        if (gamepad2.a) {
+          rightliftservoAsServo.setPosition(0.35);
+          leftclawAsServo.setPosition(0.3);
+          rightclawAsServo.setPosition(0);
+        }
+        if (gamepad2.left_bumper) {
+          leftclawAsServo.setPosition(0);
+          rightclawAsServo.setPosition(0);
+        }
+        if (gamepad2.right_bumper) {
+          leftclawAsServo.setPosition(1);
+          rightclawAsServo.setPosition(0.6);
+        }
+        if (gamepad2.dpad_right) {
+          rightliftservoAsServo.setPosition(0.7);
+        }
+        if (gamepad2.dpad_left) {
+          rightliftservoAsServo.setPosition(0.35);
+        }
+        telemetry.addData("FLeft Pow", FrontLeftAsDcMotor.getPower());
+        telemetry.addData("BLeft Pow", FrontLeftAsDcMotor.getPower());
+        telemetry.addData("FRight Pow", FrontLeftAsDcMotor.getPower());
+        telemetry.addData("BRight Pow", FrontLeftAsDcMotor.getPower());
+        telemetry.addData("LIFTPOS", liftAsDcMotor.getCurrentPosition());
+        telemetry.addData("left", leftclawAsServo.getPosition());
+        telemetry.addData("right", rightclawAsServo.getPosition());
+        telemetry.update();
+      }
+    }
+  }
+}
