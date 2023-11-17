@@ -82,7 +82,7 @@ public class TeleReaper extends LinearOpMode {
     servo0.scaleRange(0, 1);
     servo1.scaleRange(0, 1);
   //  servo2.scaleRange(0, 1);
-//    servo3.scaleRange(0, 1);
+    servo3.scaleRange(0, 1);
     initAprilTag();
     
   //  servo0.setPosition(servo0Down);
@@ -94,7 +94,7 @@ public class TeleReaper extends LinearOpMode {
    servo0.setPosition(0);
     servo1.setPosition(.2);
  //   servo2.setPosition(0);
- //   servo3.setPosition(0.3);
+    servo3.setPosition(0.3);
     if (opModeIsActive()) {
       // Put run blocks here.
       
