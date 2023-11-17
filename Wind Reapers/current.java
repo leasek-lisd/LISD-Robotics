@@ -30,7 +30,7 @@ public class TeleReaper extends LinearOpMode {
   private Servo servo0;
   private Servo servo1;
  // private Servo servo2;
- // private Servo servo3;
+  private Servo servo3;
   private DistanceSensor distance1;
   private ColorSensor color;
 
@@ -42,9 +42,7 @@ public class TeleReaper extends LinearOpMode {
   VisionPortal myVisionPortal;
   double servo0Up = 0.45;
   double servo0Down = 0.32;
-  double legLength = 10.0;
-  double maxPropRange = 50.0;
-  double minPropRange = 2.0;
+  
 
   /**
    * This function is executed when this OpMode is selected from the Driver Station.
@@ -67,7 +65,7 @@ public class TeleReaper extends LinearOpMode {
     servo0 = hardwareMap.get(Servo.class, "servo0");
     servo1 = hardwareMap.get(Servo.class, "servo1");
  //   servo2 = hardwareMap.get(Servo.class, "servo2");
- //   servo3 = hardwareMap.get(Servo.class, "servo3");
+    servo3 = hardwareMap.get(Servo.class, "servo3");
     
     
     distance1 = hardwareMap.get(DistanceSensor.class, "distance1");
@@ -231,6 +229,9 @@ public class TeleReaper extends LinearOpMode {
        backward(.5);
        double pingDistance = 1;
        
+       double legLength = 20.0;
+	   double maxPropRange = 25.0;
+       double minPropRange = 2.0;
        
        boolean atFirstLeg = false;
        boolean pastFirstLeg = false;
@@ -238,7 +239,7 @@ public class TeleReaper extends LinearOpMode {
        boolean skipLine = false;
        boolean firstLineFound = true;
        boolean colorMatch = false;
-       
+       servo3.setPosition(servo3Down);
        String stateMsg = "Searching for "+legLength;
        while(!(atFirstLeg&&pastFirstLeg&propFound)) {
          
@@ -306,7 +307,7 @@ public class TeleReaper extends LinearOpMode {
        allStop();
        //raise servo arm
        sleep(250);
-       servo0.setPosition(servo0Up);
+       servo3.setPosition(servo3Up);
        strafeRightTimed(100,.5);
         telemetry.addData(">", "Sleeping" + skipLine);
          telemetry.update();
