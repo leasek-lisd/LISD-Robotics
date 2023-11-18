@@ -38,8 +38,8 @@ public class JamesAutoRed extends LinearOpMode
     backLeft = hardwareMap.get(DcMotor.class, "backLeft");
     lift = hardwareMap.get(DcMotor.class, "liftMotor");
     pully = hardwareMap.get(DcMotor.class, "pullyMotor");
-    clawRight = hardwareMap.get(Servo.class, "clawRight");
-    clawLeft = hardwareMap.get(Servo.class, "clawLeft");
+    //clawRight = hardwareMap.get(Servo.class, "clawRight");
+    //clawLeft = hardwareMap.get(Servo.class, "clawLeft");
     //launcher = hardwareMap.get(Servo.class, "launcherServo");
     hammer = hardwareMap.get(Servo.class, "hammerServo");
     dsensor = hardwareMap.get(DistanceSensor.class, "DistanceSensor");
