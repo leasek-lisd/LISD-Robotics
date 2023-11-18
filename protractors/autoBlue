@@ -22,8 +22,8 @@ public class JamesAutoBlue extends LinearOpMode
   private DcMotor backLeft;
   private DcMotor lift;
   private DcMotor pully;
-  private Servo clawRight;
-  private Servo clawLeft;
+  //private Servo clawRight;
+  //private Servo clawLeft;
   //private Servo launcher;
   private Servo hammer;
   private DistanceSensor dsensor;
