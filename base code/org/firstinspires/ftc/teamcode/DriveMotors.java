@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutionException;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-public class DriveMotors   {
+public class DriveMotors extends Wheels  {
     
     private DcMotor frontLeftDrive;
     private DcMotor frontRightDrive;
@@ -27,17 +27,38 @@ public class DriveMotors   {
     
     }
 
+// The next four methods are where you setup your wheels
+// add code that makes your wheel roll forward with a positive value for power
+// "Forward" meaning that the top of the wheel rolls toward the front of the bot
+
+  public void turnFrontLeft(double power){
+    frontLeftDrive.setPower(power);
+  }
+  
+  public void turnFrontRight(double power){
+    frontRightDrive.setPower(power);
+  }
+  
+  public void turnBackLeft(double power){
+    backLeftDrive.setPower(power);
+  }
+  
+  public void turnBackRight(double power){
+    backRightDrive.setPower(power);
+  }
+  
+  
   
   public void slideFront(double x){
     double powerSetting = .35;
-    backLeftDrive.setPower(x*powerSetting);
-    backRightDrive.setPower(-x*powerSetting);
+    turnFrontLeft(x*powerSetting);
+    turnFrontRight(-x*powerSetting);
   }
   
   public void slideRear(double x){
     double powerSetting = .55;
-    frontLeftDrive.setPower(x*powerSetting);
-    frontRightDrive.setPower(-x*powerSetting);
+    turnBackLeft(x*powerSetting);
+    turnBackRight(-x*powerSetting);
   }
   
   //public void slideRightTimed(double x)
@@ -67,17 +88,17 @@ public class DriveMotors   {
           leftRear    /= power + Math.abs(turn);
           rightRear  /= power + Math.abs(turn);
         }
-        frontLeftDrive.setPower(leftFront);
-        frontRightDrive.setPower(rightFront);
-        backLeftDrive.setPower(leftRear);
-        backRightDrive.setPower(rightRear);
+        turnFrontLeft(leftFront);
+        turnFrontRight(rightFront);
+        turnBackLeft(leftRear);
+        turnBackRight(rightRear);
     }
     
   public void allStop(){
-    frontLeftDrive.setPower(0);
-    frontRightDrive.setPower(0);
-    backLeftDrive.setPower(0);
-    backRightDrive.setPower(0);
+    turnFrontLeft(0);
+    turnFrontRight(0);
+    turnBackLeft(0);
+    turnBackRight(0);
   }
   
     public void forward(double speed){
