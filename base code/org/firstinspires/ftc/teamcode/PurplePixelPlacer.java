@@ -7,131 +7,28 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class PurplePixelPlacer  
 {
+  double pingDistance = 1;
+  double legLength = 20.0;
+  double maxPropRange = 25.0;
+  double minPropRange = 2.0;
+  double closeLineMin = 2;
+  double closeLineMax = 4;
+  double midLineMax = 12;
+  double farLineMax = 20;
  
     double colorUp = .7;
     // todo: write your code here
    // public void runOpMode() {
    public void init(LinearOpMode linearOpMode){
 
-}
-    public boolean findPropBehind(
-     
-     int startPos, 
-     DriveMotors motors, 
-     Servo servoLifterMotor,
-     ColorSensor color,
-     DistanceSensor distance1,
-     LinearOpMode opMode)
-     throws InterruptedException, ExecutionException
-    {
-     Telemetry telemetry = opMode.telemetry;
-     /* startPos:
-       1 - Blue / Nearest Backstage
-       2 - Blue / Nearest Audience 
-       3 - Red / Nearest Backstage
-       4 - Red / Nearest Audience 
-       
-       Assuming left side mount
-     */
-    
-     if(startPos==1||startPos ==4){
-       
-       
-       double pingDistance = 1;
-       double legLength = 20.0;
-       double maxPropRange = 25.0;
-       double minPropRange = 2.0;
-       
-       boolean atFirstLeg = false;
-       boolean pastFirstLeg = false;
-       boolean propFound = false;
-       boolean skipLine = false;
-       boolean firstLineFound = true;
-       boolean colorMatch = false;
-       servoLifterMotor.setPosition(0);
-       String stateMsg = "Searching for "+legLength;
-       
-       motors.strafeRightTimed(200,1);
-       motors.backward(.5);
-       
-       while(!(atFirstLeg&&pastFirstLeg&propFound)) {
-         
-         pingDistance = distance1.getDistance(DistanceUnit.INCH);
-         telemetry.addData(">", (stateMsg + " / " + pingDistance));
-         telemetry.update();
-       // accuracy can be improved with april tags but would require camera facing that direction 
-       // also need to add something from a timeout in case it gets lost
-         if(!atFirstLeg&&pingDistance <= legLength){
-           atFirstLeg = true;
-           stateMsg+="\nfirst leg";
-         }
-         if(!pastFirstLeg&&atFirstLeg&&pingDistance > legLength){
-           pastFirstLeg = true;
-           stateMsg+="\npast first leg";
-         }
-         if(atFirstLeg&&pastFirstLeg&&pingDistance <= maxPropRange){
-           propFound = true;
-           stateMsg+="\nfound prop";
-           if(pingDistance>minPropRange){
-             firstLineFound = false;
-             skipLine = true;
-             stateMsg+="\npast found long";
-           }
-           else {
-             stateMsg+="\nfound short";
-           }
-         }
-       }
-       motors.allStop();
-       telemetry.addData(">", "Stopped, prop found skipLine = "+skipLine);
-         telemetry.update();
-      Thread.sleep(1000);
-       
-       // Add something to verify stop in correct position
-       propFound = false;
-       motors.strafeLeft(.5);
-       stateMsg = "searching for color";
-       while(!propFound){
-         // need to add timeout
-         // need to add "lost" logic
-         
-         colorMatch = 400 < color.blue() || 400 < color.red();
-         
-         if(skipLine&&colorMatch){
-           skipLine = false;
-           firstLineFound = true;
-           stateMsg += "found first line\n";
-         }
-         
-         if(!skipLine&&firstLineFound&&!colorMatch){
-           skipLine = false;
-          // stateMsg += "passed first line\n";
-           telemetry.addData(">", "passed first line");
-           telemetry.update();
-         }
-         
-         if(!skipLine&&firstLineFound&&colorMatch){
-           propFound = true;
-           stateMsg += "found line\n";
-         }
-         telemetry.addData(">", stateMsg);
-         telemetry.update();
-       }
-       motors.allStop();
-       //raise servo arm
-      Thread.sleep(250);
-       servoLifterMotor.setPosition(colorUp);
-       motors.strafeRightTimed(.5,100);
-        telemetry.addData(">", "Sleeping" + skipLine);
-         telemetry.update();
-      Thread.sleep(5000);
-       
-     }
- return true;}
- public boolean findProp(
+}   
+  
+ 
+ public int findProp(
      
      int startPos , 
      DriveMotors motors, 
@@ -149,11 +46,10 @@ public class PurplePixelPlacer
        3 - Red / Nearest Backstage
        4 - Red / Nearest Audience 
        
-       Assuming left side mount
+       Assuming forward mount, robot starting facing backstage
      */
     
-    // if(startPos==1||startPos ==4){
-     
+       int randomLocation = 0;
        boolean atFirstLeg = false;
        boolean pastFirstLeg = false;
        boolean propFound = false;
@@ -184,16 +80,16 @@ public class PurplePixelPlacer
          telemetry.update();
        }
        
-        while(!(atFirstLeg&&pastFirstLeg&propFound)&&opMode.opModeIsActive()&&myElapsedTime2.seconds() < 150) {
+         while(!(atFirstLeg&&pastFirstLeg&propFound)&&opMode.opModeIsActive()&&myElapsedTime2.seconds() < 150) {
          
          pingDistance = distance1.getDistance(DistanceUnit.INCH);
          telemetry.addData(">", (stateMsg + " / " + pingDistance));
-       //  telemetry.addData("key", myElapsedTime2.seconds());
+       
         
          telemetry.update();
        // accuracy can be improved with april tags but would require camera facing that direction 
        // also need to add something from a timeout in case it gets lost
-         if(!atFirstLeg&&pingDistance <= legLength){
+        if(!atFirstLeg&&pingDistance <= legLength){
            atFirstLeg = true;
            stateMsg+="\nfirst leg";
            myElapsedTime2.reset();
@@ -203,46 +99,58 @@ public class PurplePixelPlacer
            stateMsg+="\npast first leg";
            myElapsedTime2.reset();
          }
-         if(atFirstLeg&&pastFirstLeg&&pingDistance <= maxPropRange){
+         if(atFirstLeg&&pastFirstLeg&&pingDistance <= farLineMax){
            propFound = true;
            stateMsg+="\nfound prop";
            myElapsedTime2.reset();
-           if(pingDistance>minPropRange){
+           if(pingDistance>midLineMax){
              firstLineFound = false;
              skipLine = true;
-             stateMsg+="\npast found long";
+             stateMsg+="\n found long";
+             randomLocation = 3;
            }
-           else {
+           else if(pingDistance>closeLineMax){
+            stateMsg+="\n found mid";
+            randomLocation = 2;
+           }
+           else { 
              stateMsg+="\nfound short";
+             randomLocation = 1;
            }
          }
         }
+        
+        
           motors.allStop();
-       telemetry.addData(">", "Stopped, prop found skipLine = "+skipLine);
+       telemetry.addData(">", "Stopped, prop found skipLine = "+skipLine+" "+randomLocation);
          telemetry.update();
-      Thread.sleep(1000);
+      
        
        // Add something to verify stop in correct position
        propFound = false;
-       motors.strafeLeft(.5);
-       stateMsg = "searching for color";
+       motors.forward(.5);
+       stateMsg = "searching for color "+skipLine+" / "+firstLineFound;
+       boolean passedFirstLine = false;
        while(!propFound&&opMode.opModeIsActive()){
          // need to add timeout
          // need to add "lost" logic
          
          colorMatch = 400 < color.blue() || 400 < color.red();
          
-         if(skipLine&&colorMatch){
-           skipLine = false;
+         if(skipLine&&colorMatch&&!passedFirstLine){
+          // skipLine = false;
            firstLineFound = true;
            stateMsg += "found first line\n";
+           Thread.sleep(1000);
          }
          
-         if(!skipLine&&firstLineFound&&!colorMatch){
+         if(skipLine&&firstLineFound&&!colorMatch&&!passedFirstLine){
            skipLine = false;
           // stateMsg += "passed first line\n";
+          passedFirstLine = true;
            telemetry.addData(">", "passed first line");
            telemetry.update();
+           Thread.sleep(1000);
          }
          
          if(!skipLine&&firstLineFound&&colorMatch){
@@ -260,13 +168,8 @@ public class PurplePixelPlacer
        motors.backInches(2);
         telemetry.addData(">", "Sleeping" + skipLine);
          telemetry.update();
-     // Thread.sleep(5000);
-      
-       
-       
-       
- //    }
- return true;}
-  //  }
+     
+ return randomLocation;}
+
  
 } 
