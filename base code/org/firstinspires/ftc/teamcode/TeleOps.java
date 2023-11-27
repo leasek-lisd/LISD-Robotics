@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
-
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -21,12 +24,14 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 // This is the name that will appear in the Driver Hub Menu
 @TeleOp(name = "Driver Template")
 public class TeleOps extends LinearOpMode {
 
+
+  private IMU imu;
   private DcMotor frontLeftDrive;
   private DcMotor frontRightDrive;
   private DcMotor backLeftDrive;
@@ -45,25 +50,21 @@ public class TeleOps extends LinearOpMode {
   private ColorSensor colorDown;
   private TouchSensor armMagnetC0;
 
-  private AndroidTextToSpeech androidTextToSpeech;
+  
   boolean USE_WEBCAM;
   AprilTagProcessor myAprilTagProcessor;
   VisionPortal myVisionPortal;
-  
-  double servoPos;
-  double servoPos2;
-  
-  double servo0Up = 0.45;
-  double servo0Down = 0.32;
-  double legLength = 10.0;
-  double maxPropRange = 50.0;
-  double minPropRange = 2.0;
+  YawPitchRollAngles orientation;
+    AngularVelocity angularVelocity;
+    
+ 
 
   /**
    * This function is executed when this OpMode is selected from the Driver Station.
    */
   @Override
   public void runOpMode() {
+    
     
 /* Motor Config  *********************************************  Motor Config */
     frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDriveE0"); 
@@ -94,7 +95,8 @@ public class TeleOps extends LinearOpMode {
     extenderServo = hardwareMap.get(Servo.class, "extenderServoC2");
     lifterServo = hardwareMap.get(Servo.class, "lifterServoC3");
     launcherServo = hardwareMap.get(Servo.class, "launcherServoC4");
-   
+    imu = hardwareMap.get(IMU.class, "imu");
+    
     // Set Ranges
     elbowServo.scaleRange(0, 1);
     clawServo.scaleRange(0, 1);
@@ -107,10 +109,9 @@ public class TeleOps extends LinearOpMode {
     
     // Set INIT position
     double elbowServoPos = 0;
-   // elbowServo.setPosition(0);//extend
+   
     double clawServoPos = 1.0;
-    //clawServo.setPosition(.6);//close
-   // sleep(2000);
+    
    elbowServo.setPosition(.15);//retract
   //  double clawServoPos = 1.0;
   //  clawServo.setPosition(1);//open
@@ -132,22 +133,14 @@ public class TeleOps extends LinearOpMode {
     
 /* Init Telemetry  *****************************************  Init Telemetry */
    initAprilTag();
-   androidTextToSpeech = new AndroidTextToSpeech();
-    androidTextToSpeech.initialize();
-    androidTextToSpeech.setLanguageAndCountry("en", "US");
+   
     waitForStart();
+    imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD)));
     
     if (opModeIsActive()) { // *****************************************  Start
-      androidTextToSpeech.speak("Lets Go!");
-      // Loop while the device is still speaking.
-      while (androidTextToSpeech.isSpeaking() && opModeIsActive()) {
-        // Let the user know we are speaking
-        telemetry.addData("Status", "Speaking...");
-        telemetry.update();
-        idle();
-      }
-      telemetry.addData("Status", "Done Speaking...");
-        telemetry.update();
+      
+      
+      
       clawServoPos = .5;
       clawServo.setPosition(clawServoPos);
       DriveMotors motors = new DriveMotors(frontLeftDrive, frontRightDrive,backLeftDrive, backRightDrive);
@@ -162,8 +155,12 @@ public class TeleOps extends LinearOpMode {
        // catch(ExecutionException e){};
       while (opModeIsActive()) { // **********************************    Loop
        // SticksB.y(armMotorLeft, armMotorRight,gamepad2.left_stick_y);
-      
-        motors.move(gamepad1.left_stick_x,gamepad1.left_stick_y,gamepad1.right_stick_x);
+        double yaw = 0;
+        
+        if(gamepad1.right_trigger>.1&&!(gamepad2.right_trigger>.9)){
+          yaw = getYaw(imu);}
+          
+        motors.move2(gamepad1.left_stick_x,gamepad1.left_stick_y,gamepad1.right_stick_x,yaw);
         
         if (gamepad2.left_trigger>.9&&gamepad2.right_trigger>.9&&gamepad1.left_trigger>.9&&gamepad1.right_trigger>.9){
          drone.shoot();
@@ -237,10 +234,22 @@ public class TeleOps extends LinearOpMode {
       if(gamepad2.dpad_right){
         motors.strafeRight(.4);
       }
+      
+      
+      telemetry.addData("Yaw (Z)",getYaw(imu));
+      telemetry.update();
       }
     }
       
     }
+    
+    
+    private double getYaw(IMU imu){
+      YawPitchRollAngles orientation;
+      orientation = imu.getRobotYawPitchRollAngles();
+      return orientation.getYaw(AngleUnit.RADIANS);
+    }
+    
   private void initAprilTag() {
     AprilTagProcessor.Builder myAprilTagProcessorBuilder;
     VisionPortal.Builder myVisionPortalBuilder;
