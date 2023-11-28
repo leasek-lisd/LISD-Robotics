@@ -1,18 +1,19 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
 public class DriveMotors extends DriveTrain {
   
-  public DriveMotors(
-        DcMotor inFrontLeftDrive,
+  public DriveMotors(HardwareMap hardwareMap)
+    /*    DcMotor inFrontLeftDrive,
         DcMotor inFrontRightDrive,
         DcMotor inBackLeftDrive,
         DcMotor inBackRightDrive
-    ){
-      super(inFrontLeftDrive,inFrontRightDrive,inBackLeftDrive,inBackRightDrive);  
+    )*/{
+      super(hardwareMap);  
    //   frontLeftDrive = inFrontLeftDrive; 
   //    frontRightDrive = inFrontRightDrive;
   //    backLeftDrive = inBackLeftDrive;
