@@ -31,13 +31,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.*;
 @Autonomous(name = "AutoReaper2)")
 public class ReaperAuto extends LinearOpMode {
 private IMU imu;
-  private DcMotor frontLeftDrive;
-  private DcMotor frontRightDrive;
-  private DcMotor backLeftDrive;
-  private DcMotor backRightDrive;
-  
-  private DcMotor armMotorRight;
-  private DcMotor armMotorLeft;
+ 
   
   private Servo elbowServo;
   private Servo clawServo;
@@ -60,24 +54,9 @@ private IMU imu;
    */
   @Override
   public void runOpMode() {
-    /* Motor Config  *********************************************  Motor Config */
-    frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDriveE0"); 
-    frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDriveE1");
-    backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDriveE2");
-    backRightDrive = hardwareMap.get(DcMotor.class, "backRightDriveE3");
-    armMotorLeft = hardwareMap.get(DcMotor.class, "armMotorLeftC0");
-    armMotorRight = hardwareMap.get(DcMotor.class, "armMotorRightC1");
+
     
-    frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-    backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-    armMotorRight.setDirection(DcMotor.Direction.REVERSE);
     
-    frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    armMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    armMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     
     
@@ -129,11 +108,13 @@ waitForStart();
     imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD)));
     
     if (opModeIsActive()) {
-      DriveMotors motors = new DriveMotors(frontLeftDrive, frontRightDrive,backLeftDrive, backRightDrive);
+      DriveMotors motors = new DriveMotors(hardwareMap); // frontLeftDrive, frontRightDrive,backLeftDrive, backRightDrive);
       Launcher drone = new Launcher(launcherServo);
       Claw claw = new Claw(clawServo);
       RoboCam camera1 = new RoboCam(myAprilTagProcessor,myVisionPortal,motors);
       PurplePixelPlacer ppp = new PurplePixelPlacer();
+      //   Arm arm = new Arm(armMotorLeft, armMotorRight,elbowServo,armMagnetC0);
+     Arm arm = new Arm(elbowServo,armMagnetC0,hardwareMap);
      
         myElapsedTime.reset();
         int propLocation = 0;
