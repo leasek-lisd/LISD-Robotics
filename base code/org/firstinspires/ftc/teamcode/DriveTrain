@@ -5,16 +5,20 @@ package org.firstinspires.ftc.teamcode;
 
     // todo: write your code here
     import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.util.concurrent.ExecutionException;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public abstract class DriveTrain {
-    
+    //Telemetry telemetry = opMode.telemetry;
     DcMotor frontLeftDrive;
     DcMotor frontRightDrive;
     DcMotor backLeftDrive;
     DcMotor backRightDrive;
+    double stepPower = .5;
+    double inchesToSteps = 44;
   
   public DriveTrain(
         DcMotor inFrontLeftDrive,
@@ -36,6 +40,10 @@ public abstract class DriveTrain {
   public abstract void backLeftPower(double power);
   public abstract void backRightPower(double power);
 
+  public void setStepPower(double power){
+    stepPower = power;
+  }
+
   public boolean areBusy(){
     return((
       frontLeftDrive.isBusy()
@@ -45,15 +53,18 @@ public abstract class DriveTrain {
       ));
   }
   public void slideFront(double x){
-    double powerSetting = .35;
-    backLeftPower(x*powerSetting);
-    backRightPower(-x*powerSetting);
-  }
-  
-  public void slideRear(double x){
-    double powerSetting = .55;
+    encoderModeOff();
+    double powerSetting = .35; // tune these for your bot
     frontLeftPower(x*powerSetting);
     frontRightPower(-x*powerSetting);
+  }
+  
+  public void slideRear(double x){ // tune these for your bot
+    encoderModeOff();
+    double powerSetting = .55;
+    
+    backLeftPower(-x*powerSetting);
+    backRightPower(x*powerSetting);
   }
   
   //public void slideRightTimed(double x)
@@ -64,9 +75,9 @@ public abstract class DriveTrain {
     move3(x,y,turn,0);
   }
   public void move3(double x, double y, double turn,double offset){
-    encoderModeOff();
+    
         double rawTheta = Math.atan2(y,x);
-        double theta = rawTheta -Math.PI/4+2*offset;
+        double theta = rawTheta - 1*Math.PI/4+2*offset;
         
         double leftFront = 0;
         double rightFront = 0;
@@ -76,12 +87,12 @@ public abstract class DriveTrain {
         double cos = Math.cos(theta);
         double max = Math.max(Math.abs(sin),Math.abs(cos));
       
-        double power = Math.sqrt(x*x+y*y);
+        double power = - Math.sqrt(x*x+y*y);
         
-        leftFront = power * sin/max - turn;
-        rightFront = power * cos/max + turn;
-        leftRear = power * cos/max - turn;
-        rightRear = power * sin/max + turn;
+        leftFront = power * sin/max + turn;
+        rightFront = power * cos/max - turn;
+        leftRear = power * cos/max + turn;
+        rightRear = power * sin/max - turn;
         
         if ((power + Math.abs(turn)) > 1) {
           leftFront   /= power + Math.abs(turn);
@@ -103,70 +114,58 @@ public abstract class DriveTrain {
   }
   
     public void forward(double speed){
-        move(0,speed,0);
-    }
-    
-    public void backward(double speed){
+      encoderModeOff();
         move(0,-speed,0);
     }
     
+    public void backward(double speed){
+      encoderModeOff();
+        move(0,speed,0);
+    }
+    
     public void strafeLeft(double speed){
-      move(-speed,0,-.04);    
+      encoderModeOff();
+      move(-speed,0,0);    
     }
     
     public void strafeRight(double speed){
-      move(speed,0,.04);    
+      encoderModeOff();
+      move(speed,0,0);    
     }
     
     public void forwardInches(double inches){
       //int steps = (int) (inches * 36.6735);
-      int steps = (int) (inches * 44);
-      forwardSteps(steps,.5);
+      int steps = (int) (inches * inchesToSteps);
+      forwardSteps(steps,stepPower);
+      while(areBusy()){};
+    
     }
-    public void backInches(double inches){
-      //int steps = (int) (inches * 36.6735);
-      int steps = (int) (inches * 44);
-      forwardSteps(-steps,.5);
-      while(frontLeftDrive.isBusy()){};
+    public void backwardInches(double inches){
+      int steps = (int) (inches * inchesToSteps);
+      forwardInches(-inches);
+     
+      
     }
     
     public void forwardSteps(int motorSteps, double speed){
-     /*
-      frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      frontLeftDrive.setTargetPosition(-motorSteps);
-      frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      frontLeftPower(speed);
-      
-      
-      frontRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      frontRightDrive.setTargetPosition(-motorSteps);
-      frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      frontRightPower(speed);
-      
-      
-      backLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      backLeftDrive.setTargetPosition(-motorSteps);
-      backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      backLeftPower(speed);
-      
-      
-      backRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      backRightDrive.setTargetPosition(-motorSteps);
-      backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      backRightPower(speed);
-      */
+     
       resetAllEncoders();
-      setTargetTo(-motorSteps);
+      setTargetTo(motorSteps);
       setRunToPosition();
       setAllPower(speed);
-      // encoderModeOn();
+      while(areBusy()){};
       
-     // while(frontLeftDrive.isBusy()){}
-     // allStop();
-     // while(opModeIsActive&&)
+      
     }
     
-    
+    public void leftSteps(int motorSteps, double speed){
+      resetAllEncoders();
+      setTargetToStrafe(motorSteps);
+      setRunToPosition();
+      setAllPower(speed);
+      while(areBusy()){};
+  //    encoderModeOff();
+    }  
     
     public void setRunToPosition(){
       frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -189,6 +188,13 @@ public abstract class DriveTrain {
       backRightDrive.setTargetPosition(stepPosition);
     }
     
+    public void setTargetToStrafe(int stepPosition){
+      frontLeftDrive.setTargetPosition(stepPosition);
+      frontRightDrive.setTargetPosition(-stepPosition);
+      backLeftDrive.setTargetPosition(-stepPosition);
+      backRightDrive.setTargetPosition(stepPosition);
+    }
+    
     public void setAllPower(double speed){
       frontLeftPower(speed);
       frontRightPower(speed);
@@ -197,106 +203,37 @@ public abstract class DriveTrain {
     }
     
     public void encoderModeOff(){
-      frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-      frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-      backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-      backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+      frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     
     public void leftInches(double inches){
       //int steps = (int) (inches * 36.6735);
-      int steps = (int) (inches * 44);
+      int steps = (int) (inches * inchesToSteps);
       leftSteps(-steps,.5);
     }
     
     public void rightInches(double inches){
       //int steps = (int) (inches * 36.6735);
-      int steps = (int) (inches * 44);
+      int steps = (int) (inches * inchesToSteps);
       leftSteps(steps,.5);
     }
-    public void leftSteps(int motorSteps, double speed){
-      frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      frontLeftDrive.setTargetPosition(-motorSteps);
-      frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      frontLeftPower(speed);
-      frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
       
-      
-      frontRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      frontRightDrive.setTargetPosition(motorSteps);
-      frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      frontRightPower(speed);
-      frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-      
-      backLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      backLeftDrive.setTargetPosition(motorSteps);
-      backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      backLeftPower(speed);
-      backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-      
-      backRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      backRightDrive.setTargetPosition(-motorSteps);
-      backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      backRightPower(speed);
-      backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-      
-     // while(frontLeftDrive.isBusy()){}
-     // allStop();
-     // while(opModeIsActive&&)
-    }    
     
-    public void forwardTimed(double speed,int time) 
-    throws InterruptedException, ExecutionException
-      {
-        move(0,speed,0);
-        Thread.sleep(time);
-        allStop();
-    }
-    
-    public void backwardTimed(double speed,int time) 
-    throws InterruptedException, ExecutionException
-      {
-        move(0,-speed,0);
-        Thread.sleep(time);
-        allStop();
-    }
-    
-    public void strafeLeftTimed(double speed,int time)
-    throws InterruptedException, ExecutionException{
-      strafeLeft(speed); 
-      Thread.sleep(time);   
-      allStop();
-    }
-    
-    public void strafeRightTimed (double speed,int time)
-    throws InterruptedException, ExecutionException
-      {
-        strafeRight(-speed);
-        Thread.sleep(time);
-        allStop();    
+    public void rotate(double speed){
+      encoderModeOff();
+      move(0,0,speed); 
     }
     
     public void rotateRight(double speed){
-      move(0,0,speed);    
+      rotate(speed);
     }
     
     public void rotateLeft(double speed){
-      move(0,0,-speed);    
+      rotate(-speed);   
     }
     
-    public void rotateRightTimed(double speed,int time) 
-    throws InterruptedException, ExecutionException
-      {
-        move(0,0,speed);
-        Thread.sleep(time);
-        allStop();
-      }
     
-    public void rotateLeftTimed(double speed,int time) 
-    throws InterruptedException, ExecutionException
-      {
-        move(0,0,-speed);
-        Thread.sleep(time);
-        allStop();
-      }
 }
