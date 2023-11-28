@@ -5,6 +5,7 @@ package org.firstinspires.ftc.teamcode;
 
     // todo: write your code here
     import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.util.concurrent.ExecutionException;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,17 +21,27 @@ public abstract class DriveTrain {
     double stepPower = .5;
     double inchesToSteps = 44;
   
-  public DriveTrain(
-        DcMotor inFrontLeftDrive,
+  public DriveTrain(HardwareMap hardwareMap)
+    /*    DcMotor inFrontLeftDrive,
         DcMotor inFrontRightDrive,
         DcMotor inBackLeftDrive,
         DcMotor inBackRightDrive
-    ){
+    )*/{
         
-      frontLeftDrive = inFrontLeftDrive; 
-      frontRightDrive = inFrontRightDrive;
-      backLeftDrive = inBackLeftDrive;
-      backRightDrive = inBackRightDrive;
+      frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDriveE0"); 
+    frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDriveE1");
+    backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDriveE2");
+    backRightDrive = hardwareMap.get(DcMotor.class, "backRightDriveE3");
+   
+    frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+    backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+    
+    
+    frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    
     
     }
     
