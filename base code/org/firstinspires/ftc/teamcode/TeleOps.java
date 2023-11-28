@@ -32,13 +32,7 @@ public class TeleOps extends LinearOpMode {
 
 
   private IMU imu;
-  private DcMotor frontLeftDrive;
-  private DcMotor frontRightDrive;
-  private DcMotor backLeftDrive;
-  private DcMotor backRightDrive;
-  
-  private DcMotor armMotorRight;
-  private DcMotor armMotorLeft;
+ 
   
   private Servo elbowServo;
   private Servo clawServo;
@@ -66,26 +60,7 @@ public class TeleOps extends LinearOpMode {
   public void runOpMode() {
     
     
-/* Motor Config  *********************************************  Motor Config */
-    frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDriveE0"); 
-    frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDriveE1");
-    backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDriveE2");
-    backRightDrive = hardwareMap.get(DcMotor.class, "backRightDriveE3");
-    armMotorLeft = hardwareMap.get(DcMotor.class, "armMotorLeftC0");
-    armMotorRight = hardwareMap.get(DcMotor.class, "armMotorRightC1");
-    
-    frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
-    backRightDrive.setDirection(DcMotor.Direction.REVERSE);
-    armMotorRight.setDirection(DcMotor.Direction.REVERSE);
-    
-    frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    armMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    armMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-    
     
 /* Servo Config  *********************************************  Servo Config */
     
@@ -143,9 +118,10 @@ public class TeleOps extends LinearOpMode {
       
       clawServoPos = .5;
       clawServo.setPosition(clawServoPos);
-      DriveMotors motors = new DriveMotors(frontLeftDrive, frontRightDrive,backLeftDrive, backRightDrive);
+     DriveMotors motors = new DriveMotors(hardwareMap); // frontLeftDrive, frontRightDrive,backLeftDrive, backRightDrive);
         Launcher drone = new Launcher(launcherServo);
-        Arm arm = new Arm(armMotorLeft, armMotorRight,elbowServo,armMagnetC0);
+     //   Arm arm = new Arm(armMotorLeft, armMotorRight,elbowServo,armMagnetC0);
+     Arm arm = new Arm(elbowServo,armMagnetC0,hardwareMap);
         Claw claw = new Claw(clawServo);
         RoboCam camera1 = new RoboCam(myAprilTagProcessor,myVisionPortal,motors);
         PurplePixelPlacer ppp = new PurplePixelPlacer();
@@ -157,8 +133,9 @@ public class TeleOps extends LinearOpMode {
        // SticksB.y(armMotorLeft, armMotorRight,gamepad2.left_stick_y);
         double yaw = 0;
         
-        if(gamepad1.right_trigger>.1&&!(gamepad2.right_trigger>.9)){
-          yaw = getYaw(imu);}
+        //if(gamepad1.right_trigger>.1&&!(gamepad2.right_trigger>.9)){
+         // yaw = getYaw(imu);
+        //      }
           
         motors.move2(gamepad1.left_stick_x,gamepad1.left_stick_y,gamepad1.right_stick_x,yaw);
         
@@ -183,6 +160,11 @@ public class TeleOps extends LinearOpMode {
         if (gamepad2.right_bumper){
           claw.closeClaw();
         }
+        
+        if (gamepad1.right_bumper){
+          motors.backRightPower(1);
+        }
+        
         if (gamepad2.left_stick_button&&!gamepad2.right_stick_button){
           motors.move(0,.25,0);
         }
@@ -236,7 +218,8 @@ public class TeleOps extends LinearOpMode {
       }
       
       
-      telemetry.addData("Yaw (Z)",getYaw(imu));
+      //telemetry.addData("Yaw (Z)",getYaw(imu));
+      telemetry.addData("Yaw (Z)",yaw);
       telemetry.update();
       }
     }
