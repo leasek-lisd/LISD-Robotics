@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
 public class DriveMotors extends DriveTrain {
@@ -20,18 +21,22 @@ public class DriveMotors extends DriveTrain {
     }
  
   public void frontLeftPower(double power){
+  
     frontLeftDrive.setPower(power);
   }
 
   public void frontRightPower(double power){
+  
     frontRightDrive.setPower(power);
   }
 
   public void backLeftPower(double power){
+ 
     backLeftDrive.setPower(power);
   }
 
   public void backRightPower(double power){
+ 
     backRightDrive.setPower(power);
   }
 }
