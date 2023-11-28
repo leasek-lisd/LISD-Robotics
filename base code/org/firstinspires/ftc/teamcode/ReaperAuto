@@ -68,8 +68,8 @@ private IMU imu;
     armMotorLeft = hardwareMap.get(DcMotor.class, "armMotorLeftC0");
     armMotorRight = hardwareMap.get(DcMotor.class, "armMotorRightC1");
     
-    frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
-    backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+    frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+    backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
     armMotorRight.setDirection(DcMotor.Direction.REVERSE);
     
     frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -137,7 +137,7 @@ waitForStart();
      
         myElapsedTime.reset();
         int propLocation = 0;
-     try {
+   /*  try {
         propLocation = ppp.findProp(1,motors,lifterServo, colorDown, distanceForward, this);
        }
        catch(InterruptedException e){}
@@ -157,9 +157,22 @@ waitForStart();
          motors.strafeRight(.1);
          break;
        }
-       
+     */
+     
+       //motors.forwardInches(12);
+       motors.forwardInches(18); 
+       motors.setStepPower(.75);
+       motors.forwardInches(18); 
+       motors.setStepPower(1);
+       motors.forwardInches(18); 
+       //sleep(1000);
+       //motors.allStop(); 
+       sleep(500);
+      /* motors.rotateLeft(.25); 
        sleep(1000);
-    //   }
+       motors.allStop();
+       
+      */
     }
   }
   private void initAprilTag() {
