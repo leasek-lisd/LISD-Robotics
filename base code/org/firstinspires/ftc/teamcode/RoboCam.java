@@ -68,12 +68,12 @@ public class RoboCam {
       boolean onTrack = false;
       
         if (myAprilTagDetection.ftcPose.x-cameraOffset > 1) {
-          motors.strafeRightTimed(.25,200);
+        //  motors.strafeRightTimed(.25,200);
           telemetry.addLine("Sliding Rear -");
           
           telemetry.addLine("Move Right" + JavaUtil.formatNumber(myAprilTagDetection.ftcPose.x, 6, 1));
         } else if (myAprilTagDetection.ftcPose.x + cameraOffset < -1) {
-          motors.strafeLeftTimed(.25,200);
+       //   motors.strafeLeftTimed(.25,200);
           telemetry.addLine("Sliding Rear -");
           
           telemetry.addLine("Move Left" + JavaUtil.formatNumber(myAprilTagDetection.ftcPose.x, 6, 1));
