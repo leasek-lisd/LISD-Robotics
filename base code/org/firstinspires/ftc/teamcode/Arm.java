@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -16,13 +17,21 @@ public class Arm {
   private double elbowServoRatio;
   private double armPowerReduction = .45;
   private TouchSensor limitSensor;
-  public Arm(DcMotor inArmMotorL, DcMotor inArmMotorR, Servo inElbowServo, TouchSensor inSensor){
-    armMotorL=inArmMotorL;
-    armMotorR=inArmMotorR;
+  // public Arm(DcMotor inArmMotorL, DcMotor inArmMotorR, Servo inElbowServo, TouchSensor inSensor){
+  public Arm(Servo inElbowServo, TouchSensor inSensor,HardwareMap hardwareMap){
+   // armMotorL=inArmMotorL;
+   // armMotorR=inArmMotorR;
     limitSensor = inSensor;
     elbowServo = inElbowServo;
     elbowServoPos = 0;
     elbowServoRatio = .003;
+    armMotorL= hardwareMap.get(DcMotor.class, "armMotorLeftC0");
+    armMotorR = hardwareMap.get(DcMotor.class, "armMotorRightC1");
+    
+    armMotorR.setDirection(DcMotor.Direction.REVERSE);
+    
+    armMotorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    armMotorR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
   }
     
   
@@ -55,4 +64,3 @@ public class Arm {
   }
   
 }
-
