@@ -1,171 +1,67 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import java.util.concurrent.ExecutionException;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import com.qualcomm.robotcore.robot.Robot;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import org.firstinspires.ftc.robotcore.external.navigation.*;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
-@Autonomous(name = "AutoReaper2)")
-public class ReaperAuto extends LinearOpMode {
-private IMU imu;
- 
-  
-  private Servo elbowServo;
-  private Servo clawServo;
-  private Servo extenderServo;
-  private Servo lifterServo;
-  private Servo launcherServo;
-  
-  private DistanceSensor distanceForward;
-  private ColorSensor colorDown;
-  private TouchSensor armMagnetC0;
+@TeleOp(name = "tensor (Blocks to Java)")
+public class tensor extends LinearOpMode {
 
-  
   boolean USE_WEBCAM;
-  AprilTagProcessor myAprilTagProcessor;
+  TfodProcessor myTfodProcessor;
   VisionPortal myVisionPortal;
-  YawPitchRollAngles orientation;
-    AngularVelocity angularVelocity;
+
   /**
    * This function is executed when this OpMode is selected from the Driver Station.
    */
   @Override
   public void runOpMode() {
-
-    
-    
-
-    
-    
-/* Servo Config  *********************************************  Servo Config */
-    
-    // Match to config file
-    elbowServo = hardwareMap.get(Servo.class, "elbowServoC0");
-    clawServo = hardwareMap.get(Servo.class, "clawServoC1");
-    extenderServo = hardwareMap.get(Servo.class, "extenderServoC2");
-    lifterServo = hardwareMap.get(Servo.class, "lifterServoC3");
-    launcherServo = hardwareMap.get(Servo.class, "launcherServoC4");
-    imu = hardwareMap.get(IMU.class, "imu");
-    
-    // Set Ranges
-    elbowServo.scaleRange(0, 1);
-    clawServo.scaleRange(0, 1);
-    extenderServo.scaleRange(0, 1);
-    lifterServo.scaleRange(0, 1);
-    launcherServo.scaleRange(0, 1);
-    
-   // Set Directions
-    elbowServo.setDirection(Servo.Direction.REVERSE);
-   
-    ElapsedTime myTimer = new ElapsedTime();
-    ElapsedTime myElapsedTime = new ElapsedTime();
-    elbowServo.setPosition(.15);//retract
-  
-    extenderServo.setPosition(1.0);
-    lifterServo.setPosition(1.0);
-    launcherServo.setPosition(1.0);
-    // Put initialization blocks here.
-    myTimer = new ElapsedTime();
-    
-       
-/* Sensor Config  *****************************************  Sensor Config */    
-    
-    distanceForward = hardwareMap.get(DistanceSensor.class, "distanceForwardC1");
-    colorDown = hardwareMap.get(ColorSensor.class, "colorDownC2");
-    armMagnetC0 = hardwareMap.get(TouchSensor.class, "armMagnetC0");    
-/* Webcam Config androidTextToSpeech.initialize(); *********************************************  Webcam Config */    
-    
+    // This 2023-2024 OpMode illustrates the basics of TensorFlow Object Detection.
     USE_WEBCAM = true;
-   // initAprilTag();
-    
-/* Init Telemetry  *****************************************  Init Telemetry */
-   initAprilTag();
-    
-waitForStart();
-    imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD)));
-    
+    // Initialize TFOD before waitForStart.
+    initTfod();
+    // Wait for the match to begin.
+    telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
+    telemetry.addData(">", "Touch Play to start OpMode");
+    telemetry.update();
+    waitForStart();
     if (opModeIsActive()) {
-      DriveMotors motors = new DriveMotors(hardwareMap); // frontLeftDrive, frontRightDrive,backLeftDrive, backRightDrive);
-      Launcher drone = new Launcher(launcherServo);
-      Claw claw = new Claw(clawServo);
-      RoboCam camera1 = new RoboCam(myAprilTagProcessor,myVisionPortal,motors);
-      PurplePixelPlacer ppp = new PurplePixelPlacer();
-      //   Arm arm = new Arm(armMotorLeft, armMotorRight,elbowServo,armMagnetC0);
-     Arm arm = new Arm(elbowServo,armMagnetC0,hardwareMap);
-     
-        myElapsedTime.reset();
-        int propLocation = 0;
-   /*  try {
-        propLocation = ppp.findProp(1,motors,lifterServo, colorDown, distanceForward, this);
-       }
-       catch(InterruptedException e){}
-       catch(ExecutionException e){};
-       
-       switch(propLocation){
-        case 0:
-         motors.strafeRight(1);
-         break;
-        case 1:
-         motors.strafeRight(.5);
-         break;
-        case 2: 
-         motors.strafeRight(.25);
-         break;
-        case 3:
-         motors.strafeRight(.1);
-         break;
-       }
-     */
-     
-       //motors.forwardInches(12);
-       motors.forwardInches(18); 
-       motors.setStepPower(.75);
-       motors.forwardInches(18); 
-       motors.setStepPower(1);
-       motors.forwardInches(18); 
-       //sleep(1000);
-       //motors.allStop(); 
-       sleep(500);
-      /* motors.rotateLeft(.25); 
-       sleep(1000);
-       motors.allStop();
-       
-      */
+      // Put run blocks here.
+      while (opModeIsActive()) {
+        // Put loop blocks here.
+        telemetryTfod();
+        // Push telemetry to the Driver Station.
+        telemetry.update();
+        if (gamepad1.dpad_down) {
+          // Temporarily stop the streaming session.
+          myVisionPortal.stopStreaming();
+        } else if (gamepad1.dpad_up) {
+          // Resume the streaming session if previously stopped.
+          myVisionPortal.resumeStreaming();
+        }
+        // Share the CPU.
+        sleep(20);
+      }
     }
   }
-  private void initAprilTag() {
-    AprilTagProcessor.Builder myAprilTagProcessorBuilder;
+
+  /**
+   * Initialize TensorFlow Object Detection.
+   */
+  private void initTfod() {
+    TfodProcessor.Builder myTfodProcessorBuilder;
     VisionPortal.Builder myVisionPortalBuilder;
 
-    // First, create an AprilTagProcessor.Builder.
-    myAprilTagProcessorBuilder = new AprilTagProcessor.Builder();
-    myAprilTagProcessorBuilder.setLensIntrinsics(835.112, 835.112, 322.08, 242.678);
-    
-    // Create an AprilTagProcessor by calling build.
-    myAprilTagProcessor = myAprilTagProcessorBuilder.build();
+    // First, create a TfodProcessor.Builder.
+    myTfodProcessorBuilder = new TfodProcessor.Builder();
+    // Create a TfodProcessor by calling build.
+    myTfodProcessor = myTfodProcessorBuilder.build();
     // Next, create a VisionPortal.Builder and set attributes related to the camera.
     myVisionPortalBuilder = new VisionPortal.Builder();
     if (USE_WEBCAM) {
@@ -175,11 +71,48 @@ waitForStart();
       // Use the device's back camera.
       myVisionPortalBuilder.setCamera(BuiltinCameraDirection.BACK);
     }
-    
-    // Add myAprilTagProcessor to the VisionPortal.Builder.
-    myVisionPortalBuilder.addProcessor(myAprilTagProcessor);
+    // Add myTfodProcessor to the VisionPortal.Builder.
+    myVisionPortalBuilder.addProcessor(myTfodProcessor);
     // Create a VisionPortal by calling build.
     myVisionPortal = myVisionPortalBuilder.build();
   }
 
+  /**
+   * Display info (using telemetry) for a detected object
+   */
+  private void telemetryTfod() {
+    List<Recognition> myTfodRecognitions;
+    Recognition myTfodRecognition;
+    float x;
+    float y;
+    int pixelLocation;
+
+    // Get a list of recognitions from TFOD.
+    myTfodRecognitions = myTfodProcessor.getRecognitions();
+    telemetry.addData("# Objects Detected", JavaUtil.listLength(myTfodRecognitions));
+    // Iterate through list and call a function to display info for each recognized object.
+    for (Recognition myTfodRecognition_item : myTfodRecognitions) {
+      myTfodRecognition = myTfodRecognition_item;
+      // Display info about the recognition.
+      telemetry.addLine("");
+      // Display label and confidence.
+      // Display the label and confidence for the recognition.
+      telemetry.addData("Image", myTfodRecognition.getLabel() + " (" + JavaUtil.formatNumber(myTfodRecognition.getConfidence() * 100, 0) + " % Conf.)");
+      // Display position.
+      x = (myTfodRecognition.getLeft() + myTfodRecognition.getRight()) / 2;
+      y = (myTfodRecognition.getTop() + myTfodRecognition.getBottom()) / 2;
+      if (x < 200) {
+        pixelLocation = 1;
+      } else if (x > 400) {
+        pixelLocation = 3;
+      } else {
+        pixelLocation = 2;
+      }
+      // Display the position of the center of the detection boundary for the recognition
+      telemetry.addData("- Position", JavaUtil.formatNumber(x, 0) + ", " + JavaUtil.formatNumber(y, 0));
+      // Display size
+      // Display the size of detection boundary for the recognition
+      telemetry.addData("- Line: ", JavaUtil.formatNumber(pixelLocation, 0) + "" + "");
+    }
+  }
 }
