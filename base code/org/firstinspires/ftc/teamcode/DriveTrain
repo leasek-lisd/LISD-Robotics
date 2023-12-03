@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-
-
-
+// new line to create motors object:
+// DriveMotors motors = new DriveMotors(hardwareMap,imu, this); // frontLeftDrive, frontRightDrive,backLeftDrive, backRightDrive);
+ 
     // todo: write your code here
     import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,6 +11,12 @@ import java.util.concurrent.ExecutionException;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import org.firstinspires.ftc.robotcore.external.navigation.*;//YawPitchRollAngles;
+import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public abstract class DriveTrain {
     //Telemetry telemetry = opMode.telemetry;
@@ -18,16 +24,17 @@ public abstract class DriveTrain {
     DcMotor frontRightDrive;
     DcMotor backLeftDrive;
     DcMotor backRightDrive;
+    private IMU imu;
     double stepPower = .5;
     double inchesToSteps = 44;
   
-  public DriveTrain(HardwareMap hardwareMap)
+  public DriveTrain(HardwareMap hardwareMap, IMU newImu, LinearOpMode opMode)
     /*    DcMotor inFrontLeftDrive,
         DcMotor inFrontRightDrive,
         DcMotor inBackLeftDrive,
         DcMotor inBackRightDrive
     )*/{
-        
+        imu=newImu;
       frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDriveE0"); 
     frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDriveE1");
     backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDriveE2");
@@ -35,6 +42,8 @@ public abstract class DriveTrain {
    
     frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
     backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+    frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+    backRightDrive.setDirection(DcMotor.Direction.REVERSE);
     
     
     frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -51,16 +60,21 @@ public abstract class DriveTrain {
   public abstract void backLeftPower(double power);
   public abstract void backRightPower(double power);
 
+  public int getFrontLeftPosition(){
+    return frontLeftDrive.getCurrentPosition();
+  }
+
   public void setStepPower(double power){
     stepPower = power;
   }
 
   public boolean areBusy(){
-    return((
+    return(
+      (
       frontLeftDrive.isBusy()
-      ||frontRightDrive.isBusy()
-      ||backRightDrive.isBusy()
-      ||backLeftDrive.isBusy()
+      || frontRightDrive.isBusy()
+      || backRightDrive.isBusy()
+      || backLeftDrive.isBusy()
       ));
   }
   public void slideFront(double x){
@@ -145,18 +159,53 @@ public abstract class DriveTrain {
     }
     
     public void forwardInches(double inches){
-      //int steps = (int) (inches * 36.6735);
+      forwardInches(inches,true);
+    }
+    
+    public void forwardInches(double inches,boolean wait){
       int steps = (int) (inches * inchesToSteps);
       forwardSteps(steps,stepPower);
-      while(areBusy()){};
-    
+      if(wait){
+        while(areBusy()){};
+      }
     }
+    
     public void backwardInches(double inches){
+      backwardInches(inches, true);
+    }
+    public void backwardInches(double inches,boolean wait){
       int steps = (int) (inches * inchesToSteps);
       forwardInches(-inches);
-     
+    }
+    
+    public void leftInches(double inches){
+      leftInches(inches,true);
+    }
+    
+    public void leftInches(double inches,boolean wait){
+      int steps = (int) (inches * inchesToSteps);
+      leftSteps(-steps,stepPower);
+      if(wait){
+        while(areBusy()){};
+      }
+    }
+    
+    
+    public void rightInches(double inches){
+      rightInches(inches,true);
+    }
+    public void rightInches(double inches,boolean wait){
+      int steps = (int) (inches * inchesToSteps);
+      leftSteps(steps,stepPower);
+      if(wait){
+        while(areBusy()){};
+       }
       
     }
+     public void finsh(){
+       while(areBusy()){};
+     }
+    
     
     public void forwardSteps(int motorSteps, double speed){
      
@@ -164,7 +213,7 @@ public abstract class DriveTrain {
       setTargetTo(motorSteps);
       setRunToPosition();
       setAllPower(speed);
-      while(areBusy()){};
+      //while(areBusy()){};
       
       
     }
@@ -174,16 +223,9 @@ public abstract class DriveTrain {
       setTargetToStrafe(motorSteps);
       setRunToPosition();
       setAllPower(speed);
-      while(areBusy()){};
+  //    while(areBusy()){};
   //    encoderModeOff();
     }  
-    
-    public void setRunToPosition(){
-      frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
     
     public void resetAllEncoders(){
       frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -191,13 +233,22 @@ public abstract class DriveTrain {
       backLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
       backRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
-    
     public void setTargetTo(int stepPosition){
       frontLeftDrive.setTargetPosition(stepPosition);
       frontRightDrive.setTargetPosition(stepPosition);
       backLeftDrive.setTargetPosition(stepPosition);
       backRightDrive.setTargetPosition(stepPosition);
     }
+    public void setRunToPosition(){
+      frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+    
+    
+    
+    
     
     public void setTargetToStrafe(int stepPosition){
       frontLeftDrive.setTargetPosition(stepPosition);
@@ -220,18 +271,21 @@ public abstract class DriveTrain {
       backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     
-    public void leftInches(double inches){
-      //int steps = (int) (inches * 36.6735);
-      int steps = (int) (inches * inchesToSteps);
-      leftSteps(-steps,.5);
+    public void rotateRightDegrees(int angle, double speed){
+      imu.resetYaw();
+      while(getYaw()>-angle){
+          move(0,0,speed);
+         
+      }
     }
-    
-    public void rightInches(double inches){
-      //int steps = (int) (inches * 36.6735);
-      int steps = (int) (inches * inchesToSteps);
-      leftSteps(steps,.5);
-    }
-      
+     
+     public void rotateLeftDegrees(int angle, double speed){
+      imu.resetYaw();
+      while(getYaw()<angle){
+          move(0,0,-speed);
+         
+      }
+    } 
     
     public void rotate(double speed){
       encoderModeOff();
@@ -244,6 +298,12 @@ public abstract class DriveTrain {
     
     public void rotateLeft(double speed){
       rotate(-speed);   
+    }
+    public double getYaw(){
+      YawPitchRollAngles orientation;
+      
+      orientation = imu.getRobotYawPitchRollAngles();
+      return orientation.getYaw(AngleUnit.DEGREES);
     }
     
     
