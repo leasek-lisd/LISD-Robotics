@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 // new line to create motors object:
-// DriveMotors motors = new DriveMotors(hardwareMap,imu, this); // frontLeftDrive, frontRightDrive,backLeftDrive, backRightDrive);
+// DriveMotors motors = new DriveMotors(hardwareMap,imu, this); 
  
     // todo: write your code here
     import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
