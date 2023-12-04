@@ -1,187 +1,324 @@
-/*
-Copyright 2023 FIRST Tech Challenge Team FTC
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
-associated documentation files (the "Software"), to deal in the Software without restriction,
-including without limitation the rights to use, copy, modify, merge, publish, distribute,
-sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial
-portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
-NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+
+
+    // todo: write your code here
+    import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import java.util.concurrent.ExecutionException;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.*;//YawPitchRollAngles;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
-@Autonomous
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
-  public class TestAuto extends LinearOpMode {
-  private IMU imu;
-  private Servo elbowServo;
-  private Servo clawServo;
-  private Servo extenderServo;
-  private Servo lifterServo;
-  private Servo launcherServo;
-  private DistanceSensor distanceForward;
-  private ColorSensor colorDown;
-  private TouchSensor armMagnetC0;
-  private int propLocation = 0;
+public abstract class DriveTrain {
+    //Telemetry telemetry = opMode.telemetry;
+    DcMotor frontLeftDrive;
+    DcMotor frontRightDrive;
+    DcMotor backLeftDrive;
+    DcMotor backRightDrive;
+    private IMU imu;
+    double stepPower = .5;
+    double inchesToSteps = 44;
   
-  boolean USE_WEBCAM;
-
-    @Override
-    public void runOpMode() {
-      elbowServo = hardwareMap.get(Servo.class, "elbowServoC0");
-      clawServo = hardwareMap.get(Servo.class, "clawServoC1");
-      extenderServo = hardwareMap.get(Servo.class, "extenderServoC2");
-      lifterServo = hardwareMap.get(Servo.class, "lifterServoC3");
-      launcherServo = hardwareMap.get(Servo.class, "launcherServoC4");
-      imu = hardwareMap.get(IMU.class, "imu");
-      
-      
-      elbowServo.scaleRange(0, 1);
-      clawServo.scaleRange(0, 1);
-      extenderServo.scaleRange(0, 1);
-      lifterServo.scaleRange(0, 1);
-      launcherServo.scaleRange(0, 1);
-      
-      elbowServo.setDirection(Servo.Direction.REVERSE);
-      
-      
-      
-      distanceForward = hardwareMap.get(DistanceSensor.class, "distanceForwardC1");
-      colorDown = hardwareMap.get(ColorSensor.class, "colorDownC2");
-      armMagnetC0 = hardwareMap.get(TouchSensor.class, "armMagnetC0");
-      
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-          imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD)));
-          DriveMotors motors = new DriveMotors(hardwareMap,imu, this); // frontLeftDrive, frontRightDrive,backLeftDrive, backRightDrive);
-          Launcher drone = new Launcher(launcherServo);
-          Claw claw = new Claw(clawServo);
-          Arm arm = new Arm(elbowServo,armMagnetC0,hardwareMap);
-          
-          // need to put code below into contructors
-          elbowServo.setPosition(.15);//retract
-          clawServo.setPosition(.65);
-          extenderServo.setPosition(1.0);
-          lifterServo.setPosition(1.0);
-          launcherServo.setPosition(1.0);
-         // motors.forwardInches(12);
-          telemetry.addData("Motors Busy? ", motors.areBusy());
-            telemetry.update();
-       // motors.forwardInches(6);
-      // motors.rightInches(4);
-      // motors.backwardInches(45);
-      //  sleep(5000);
-        boolean skip = false;
-        
-      motors.rotateRightDegrees(1210,.25);
-        sleep(500);
-        imu.resetYaw();
-       
-       
-        motors.rotateLeftDegrees(260,.25);
-        sleep(10000);
-      if(skip||distanceForward.getDistance(DistanceUnit.INCH)<28&&distanceForward.getDistance(DistanceUnit.INCH)>24){
-        telemetry.addLine("Middle Line Found");
-        telemetry.update();
-        motors.leftInches(4);
-        
-        motors.forwardInches(45,false);
-        //sleep(2000);
-        boolean found = false;
-        while(motors.areBusy()){
-            //sleep(200);
-            if(colorDown.red() > 300){
-             motors.allStop();
-             telemetry.addLine("found color");
-            telemetry.update();
-            motors.backwardInches(1);
-            found = true;
-            }
-            else{
-                telemetry.addLine("looking for color " + colorDown.red());
-            telemetry.update();
-            }
-        }
-        if(!found){
-          motors.backwardInches(6,false);
-        while(motors.areBusy()){
-        if(colorDown.red() > 300){
-             motors.allStop();
-             telemetry.addLine("found color");
-            telemetry.update();
-            motors.forwardInches(2);
-            found = true;
-            }
-            else{
-                telemetry.addLine("looking for color " + colorDown.red());
-            telemetry.update();
-            }
-          
-        }
-        }
-        telemetry.addLine("done moving" + colorDown.blue());
-            telemetry.update();
-        sleep(5000);
-      } 
-      else{
-        motors.forwardInches(2);
-        motors.leftInches(24,false);
-        while(motors.areBusy()){
-          if(distanceForward.getDistance(DistanceUnit.INCH)<22&&distanceForward.getDistance(DistanceUnit.INCH)>18){
-            motors.allStop();
-            telemetry.addLine("Left Line Found");
-            motors.leftInches(13.5);
-            
-            telemetry.update();
-            sleep(5000);
-          }
-        }
-        
-      } 
+  public DriveTrain(HardwareMap hardwareMap, IMU newImu, LinearOpMode opMode)
+    /*    DcMotor inFrontLeftDrive,
+        DcMotor inFrontRightDrive,
+        DcMotor inBackLeftDrive,
+        DcMotor inBackRightDrive
+    )*/{
+        imu=newImu;
+      frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDriveE0"); 
+    frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDriveE1");
+    backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDriveE2");
+    backRightDrive = hardwareMap.get(DcMotor.class, "backRightDriveE3");
+   
+    frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+    backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+    frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+    backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+    
+    
+    frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    
+    
     }
-      public double getYaw(){
+    
+
+  public abstract void frontLeftPower(double power);
+  public abstract void frontRightPower(double power);
+  public abstract void backLeftPower(double power);
+  public abstract void backRightPower(double power);
+
+  public int getFrontLeftPosition(){
+    return frontLeftDrive.getCurrentPosition();
+  }
+
+  public void setStepPower(double power){
+    stepPower = power;
+  }
+
+  public boolean areBusy(){
+    return(
+      (
+      frontLeftDrive.isBusy()
+      || frontRightDrive.isBusy()
+      || backRightDrive.isBusy()
+      || backLeftDrive.isBusy()
+      ));
+  }
+  public void slideFront(double x){
+    encoderModeOff();
+    double powerSetting = .35; // tune these for your bot
+    frontLeftPower(x*powerSetting);
+    frontRightPower(-x*powerSetting);
+  }
+  
+  public void slideRear(double x){ // tune these for your bot
+    encoderModeOff();
+    double powerSetting = .55;
+    
+    backLeftPower(-x*powerSetting);
+    backRightPower(x*powerSetting);
+  }
+  
+  //public void slideRightTimed(double x)
+  public void move2(double x, double y, double turn,double offset){
+    move3(x,y,turn,offset);
+  }
+  public void move(double x, double y, double turn){
+    move3(x,y,turn,0);
+  }
+  public void move3(double x, double y, double turn,double offset){
+    
+        double rawTheta = Math.atan2(y,x);
+        double theta = rawTheta - 1*Math.PI/4+2*offset;
+        
+        double leftFront = 0;
+        double rightFront = 0;
+        double leftRear = 0;
+        double rightRear = 0;
+        double sin = Math.sin(theta);
+        double cos = Math.cos(theta);
+        double max = Math.max(Math.abs(sin),Math.abs(cos));
+      
+        double power = - Math.sqrt(x*x+y*y);
+        
+        leftFront = power * sin/max + turn;
+        rightFront = power * cos/max - turn;
+        leftRear = power * cos/max + turn;
+        rightRear = power * sin/max - turn;
+        
+        if ((power + Math.abs(turn)) > 1) {
+          leftFront   /= power + Math.abs(turn);
+          rightFront /= power + Math.abs(turn);
+          leftRear    /= power + Math.abs(turn);
+          rightRear  /= power + Math.abs(turn);
+        }
+        frontLeftPower(leftFront);
+        frontRightPower(rightFront);
+        backLeftPower(leftRear);
+        backRightPower(rightRear);
+    }
+    
+  public void allStop(){
+    frontLeftPower(0);
+    frontRightPower(0);
+    backLeftPower(0);
+    backRightPower(0);
+  }
+  
+    public void forward(double speed){
+      encoderModeOff();
+        move(0,-speed,0);
+    }
+    
+    public void backward(double speed){
+      encoderModeOff();
+        move(0,speed,0);
+    }
+    
+    public void strafeLeft(double speed){
+      encoderModeOff();
+      move(-speed,0,0);    
+    }
+    
+    public void strafeRight(double speed){
+      encoderModeOff();
+      move(speed,0,0);    
+    }
+    
+    public void forwardInches(double inches){
+      forwardInches(inches,true);
+    }
+    
+    public void forwardInches(double inches,boolean wait){
+      int steps = (int) (inches * inchesToSteps);
+      forwardSteps(steps,stepPower);
+      if(wait){
+        while(areBusy()){};
+      }
+    }
+    
+    public void backwardInches(double inches){
+      backwardInches(inches, true);
+    }
+    public void backwardInches(double inches,boolean wait){
+      int steps = (int) (inches * inchesToSteps);
+      forwardInches(-inches);
+    }
+    
+    public void leftInches(double inches){
+      leftInches(inches,true);
+    }
+    
+    public void leftInches(double inches,boolean wait){
+      int steps = (int) (inches * inchesToSteps);
+      leftSteps(-steps,stepPower);
+      if(wait){
+        while(areBusy()){};
+      }
+    }
+    
+    
+    public void rightInches(double inches){
+      rightInches(inches,true);
+    }
+    public void rightInches(double inches,boolean wait){
+      int steps = (int) (inches * inchesToSteps);
+      leftSteps(steps,stepPower);
+      if(wait){
+        while(areBusy()){};
+       }
+      
+    }
+     public void finish(){
+       while(areBusy()){};
+     }
+    
+    
+    public void forwardSteps(int motorSteps, double speed){
+     
+      resetAllEncoders();
+      setTargetTo(motorSteps);
+      setRunToPosition();
+      setAllPower(speed);
+      //while(areBusy()){};
+      
+      
+    }
+    
+    public void leftSteps(int motorSteps, double speed){
+      resetAllEncoders();
+      setTargetToStrafe(motorSteps);
+      setRunToPosition();
+      setAllPower(speed);
+  //    while(areBusy()){};
+  //    encoderModeOff();
+    }  
+    
+    public void resetAllEncoders(){
+      frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      frontRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      backLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      backRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+    public void setTargetTo(int stepPosition){
+      frontLeftDrive.setTargetPosition(stepPosition);
+      frontRightDrive.setTargetPosition(stepPosition);
+      backLeftDrive.setTargetPosition(stepPosition);
+      backRightDrive.setTargetPosition(stepPosition);
+    }
+    public void setRunToPosition(){
+      frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+    
+    
+    
+    
+    
+    public void setTargetToStrafe(int stepPosition){
+      frontLeftDrive.setTargetPosition(stepPosition);
+      frontRightDrive.setTargetPosition(-stepPosition);
+      backLeftDrive.setTargetPosition(-stepPosition);
+      backRightDrive.setTargetPosition(stepPosition);
+    }
+    
+    public void setAllPower(double speed){
+      frontLeftPower(speed);
+      frontRightPower(speed);
+      backLeftPower(speed);
+      backRightPower(speed);
+    }
+    
+    public void encoderModeOff(){
+      frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    
+    public void rotateRightDegrees(int angle, double speed){
+      imu.resetYaw();
+      if(angle>180){
+        rotateLeftDegrees(angle-180,speed);
+      }
+      else {
+      double startYaw=getYaw();
+      while(getYaw()> startYaw - angle){
+          move(0,0,speed);
+         
+      }
+      allStop();
+      }
+    }
+     
+     public void rotateLeftDegrees(int angle, double speed){
+      imu.resetYaw();
+      double startYaw=getYaw();
+      if(angle>180){
+        rotateRightDegrees(angle-180,speed);
+      }
+      else {
+      while(getYaw()< startYaw + angle){
+          move(0,0,-speed);
+         
+      }
+      allStop();
+      }
+    } 
+    
+    public void rotate(double speed){
+      encoderModeOff();
+      move(0,0,speed); 
+    }
+    
+    public void rotateRight(double speed){
+      rotate(speed);
+    }
+    
+    public void rotateLeft(double speed){
+      rotate(-speed);   
+    }
+    public double getYaw(){
       YawPitchRollAngles orientation;
       
       orientation = imu.getRobotYawPitchRollAngles();
       return orientation.getYaw(AngleUnit.DEGREES);
     }
-     
-    
-  
     
     
 }
