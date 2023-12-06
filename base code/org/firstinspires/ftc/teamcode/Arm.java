@@ -28,6 +28,7 @@ public class Arm {
     armMotorL= hardwareMap.get(DcMotor.class, "armMotorLeftC0");
     armMotorR = hardwareMap.get(DcMotor.class, "armMotorRightC1");
     
+    //armMotorL.setDirection(DcMotor.Direction.REVERSE);
     armMotorR.setDirection(DcMotor.Direction.REVERSE);
     
     armMotorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -45,6 +46,16 @@ public class Arm {
       
     }
   
+  }
+  
+  public void moveSteps(int steps, double speed){
+    // 38 steps per rev
+    // 80:1 gear ratio
+
+    armMotorL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    armMotorL.setTargetPosition(steps);
+    armMotorL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    armMotorL.setPower(speed);
   }
   
   public void moveElbow(double y){
