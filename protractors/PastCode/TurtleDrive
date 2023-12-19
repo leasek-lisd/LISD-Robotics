@@ -1,0 +1,36 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+
+public class DriveMotors extends DriveTrain {
+  
+  public DriveMotors(HardwareMap hardwareMap, IMU imu, LinearOpMode newOpMode)
+  {
+    super(hardwareMap, imu, newOpMode);  
+  }
+ 
+  public void frontLeftPower(double power)
+  {
+    FrontLeft.setPower(power);
+  }
+
+  public void frontRightPower(double power)
+  {
+    FrontRight.setPower(power);
+  }
+
+  public void backLeftPower(double power)
+  {
+    backLeft.setPower(power);
+  }
+
+  public void backRightPower(double power)
+  {
+    backRight.setPower(power);
+  }
+}
+  
