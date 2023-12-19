@@ -1,0 +1,70 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import java.util.concurrent.ExecutionException;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+
+public class arm 
+{
+  DcMotor liftMotor;
+  DcMotor pullyMotor;
+  TouchSensor tsensor;
+  Servo clawServo;
+
+  public arm(HardwareMap hardwareMap)
+  {
+      liftMotor = hardwareMap.get(DcMotor.class, "liftMotorE0");
+      pullyMotor = hardwareMap.get(DcMotor.class, "pullyMotorE1");
+      tsensor = hardwareMap.get(TouchSensor.class, "touchCD1");
+      clawServo = hardwareMap.get(Servo.class, "clawServoE3");
+  }
+  public void pullyOperations(double input)
+  {
+    if (tsensor.isPressed()) 
+      {
+        pullyMotor.setPower(input);
+        //Really this should be zero buts is bad for testing
+      }
+      else 
+      {
+        pullyMotor.setPower(input);
+      }
+  }
+  public void liftOperations(double input)
+  {
+    liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    liftMotor.setPower(input);
+  }
+  public void lps(int input)
+  {
+    liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    liftMotor.setTargetPosition(input);
+    liftMotor.setPower(1);
+    while(liftMotor.isBusy())
+    {//DO NOT PUT ANYTHING IN HERE
+    }
+    liftMotor.setPower(0);
+  }
+  public void clawClose()
+  {
+    clawServo.setPosition(1);
+  }
+  
+  public void clawOpen()
+  {
+    clawServo.setPosition(.7);
+  }
+}
+  
