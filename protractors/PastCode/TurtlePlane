@@ -1,0 +1,45 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import java.util.concurrent.ExecutionException;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+public class Plane 
+{
+    Servo launcher;
+    Servo angler;
+    
+    public Plane(HardwareMap hardwareMap)
+    {
+        launcher = hardwareMap.get(Servo.class, "launchServoE0");
+        angler = hardwareMap.get(Servo.class, "angleServoE1");
+    //    launcher.setDirection(Servo.Direction.REVERSE);
+        
+    }
+    public void init ()
+    {
+     //launcher.setPosition(0);  // 0 is ready to load .4
+     angler.setPosition(0.22);
+    }
+    public void prepwork()
+    {
+        angler.setPosition(0.4);
+    }
+    public void reload()
+    {
+        angler.setPosition(-0.35);
+        launcher.setPosition(-.5);
+    }
+    public void fire()
+    {  // at rest is around .25 raise is about .7
+        launcher.setPosition(1);
+    }
+}
