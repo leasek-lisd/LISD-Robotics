@@ -1,0 +1,130 @@
+package org.firstinspires.ftc.teamcode;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import java.util.concurrent.ExecutionException;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import com.qualcomm.robotcore.robot.Robot;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import java.util.List;
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.*;
+
+// This is the name that will appear in the Driver Hub Menu
+@TeleOp(name = "ProfessionalTractors")
+public class ProfessionalTractors extends LinearOpMode 
+{
+  private IMU imu;
+ 
+  /**
+   * This function is executed when this OpMode is selected from the Driver Station.
+   */
+  @Override
+  public void runOpMode() 
+  {
+    imu = hardwareMap.get(IMU.class, "imu");
+/* Motor Config  *********************************************  Motor Config */    
+   DriveMotors motors = new DriveMotors(hardwareMap, imu, this);  // frontLeftDrive, frontRightDrive,backLeftDrive, backRightDrive);
+/* Arm Config  *********************************************  Servo Config */
+   arm arm = new arm(hardwareMap);
+    
+/* PixelPlacer Config  *****************************************  Sensor Config */    
+   PurplePixelPlacer purplePixel = new PurplePixelPlacer(hardwareMap);  
+   
+/* PixelPlacer Config  *****************************************  Sensor Config */    
+   Plane elytra = new Plane(hardwareMap);  
+   
+/* Webcam Config androidTextToSpeech.initialize(); *********************************************  Webcam Config */    
+    
+    
+/* Init Telemetry  *****************************************  Init Telemetry */
+   imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD)));
+    
+    
+    waitForStart();
+    if (opModeIsActive())
+    elytra.init();
+    { 
+      
+      // *****************************************  Start
+      while (opModeIsActive()) 
+      { 
+        // **********************************    Loop
+        motors.move2(gamepad1.left_stick_x,gamepad1.left_stick_y,gamepad1.right_stick_x,0);
+        arm.pullyOperations(gamepad2.right_stick_y);
+        arm.liftOperations(gamepad2.left_stick_y);
+        //Note that the Sleep method applies to the ENTIRE BOT so nothing else can happen while its active
+        if(gamepad2.x)
+        {
+          arm.lps(-200);
+          sleep(1000); 
+          arm.lps(190);
+          //Claw could activate here
+        }
+        if(gamepad2.y)
+        {
+          arm.lps(-370);
+          sleep(1000);
+          arm.lps(360);
+          //Claw could activate here
+        }
+        if(gamepad2.left_bumper)
+        {
+          arm.clawClose();
+        }
+        if(gamepad2.right_bumper)
+        {
+          arm.clawOpen();
+        }
+        
+        if(gamepad2.a)
+        {
+          elytra.prepwork();
+          sleep(100);
+          elytra.fire();
+        }
+        if(gamepad2.b)
+        {
+          elytra.reload();
+        }
+        if(gamepad2.dpad_up || gamepad1.dpad_up)
+        {
+         // motors.move4(0,.5);
+        }
+        if(gamepad2.dpad_down || gamepad1.dpad_down)
+        {
+          //motors.move4(0,-.5);
+        }
+        if(gamepad2.dpad_left || gamepad1.dpad_left)
+        {
+         // motors.move4(-.5,0);
+        }
+        if(gamepad2.dpad_right || gamepad1.dpad_right)
+        {
+          //motors.move4(.5,0);
+        }
+        telemetry.addData("FLeft Pow", motors.getFLpow());
+        telemetry.addData("BLeft Pow", motors.getFRpow());
+        telemetry.addData("FRight Pow", motors.getBLpow());
+        telemetry.addData("BRight Pow", motors.getBRpow());
+        telemetry.update();
+      }
+    }
+  }
+}
