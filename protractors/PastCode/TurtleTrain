@@ -1,0 +1,382 @@
+//Class Setup
+package org.firstinspires.ftc.teamcode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import java.util.concurrent.ExecutionException;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import org.firstinspires.ftc.robotcore.external.navigation.*;//YawPitchRollAngles;
+import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+
+public abstract class DriveTrain 
+{
+  //Telemetry telemetry = opMode.telemetry;
+  DcMotor FrontLeft;
+  DcMotor FrontRight;
+  DcMotor backLeft;
+  DcMotor backRight;
+  private IMU imu;
+  double stepPower = .5;
+  double inchesToSteps = 30;//Old save 44
+  
+  public DriveTrain(HardwareMap hardwareMap, IMU newImu, LinearOpMode opMode)
+  {
+  //Declares Reverses and HardwareMaps all the Motors
+    imu=newImu;
+    FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeftC0"); 
+    FrontRight = hardwareMap.get(DcMotor.class, "FrontRightC1");
+    backLeft = hardwareMap.get(DcMotor.class, "backLeftC2");
+    backRight = hardwareMap.get(DcMotor.class, "backRightC3");
+    
+   
+   //8114 Specific reversals
+    backRight.setDirection(DcMotor.Direction.REVERSE);
+    backLeft.setDirection(DcMotor.Direction.REVERSE);
+    
+    FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+  }
+  //Grabs motors from DriveMotors
+  public abstract void frontLeftPower(double power);
+  public abstract void frontRightPower(double power);
+  public abstract void backLeftPower(double power);
+  public abstract void backRightPower(double power);
+
+
+//I think this is for telemetry but I dont use it
+  public int getFrontLeftPosition()
+  {
+    return FrontLeft.getCurrentPosition();
+  }
+  
+  
+//Settings Methods
+  public void setStepPower(double power){
+    stepPower = power;
+  }
+  public boolean areBusy()
+  {
+    return((FrontLeft.isBusy()|| FrontRight.isBusy()|| backRight.isBusy()|| backLeft.isBusy()));
+  }
+  
+  
+//Slide Methods  
+    public void slideFront(double x){
+      encoderModeOff();
+      double powerSetting = .35; // tune these for your bot
+      frontLeftPower(x*powerSetting);
+      frontRightPower(-x*powerSetting);
+    }
+  
+    public void slideRear(double x){ // tune these for your bot
+      encoderModeOff();
+      double powerSetting = .55;
+    
+      backLeftPower(-x*powerSetting);
+      backRightPower(x*powerSetting);
+    }
+  
+  
+//Move Methods
+    public void move(double x, double y, double turn) //Does move 3 with the x, y, and turn no offset
+    {
+      move3(x,y,turn,0);
+    }
+  
+    public void move2(double x, double y, double turn,double offset) //Does all of move 3
+    {
+      move3(x,y,turn,offset);
+    }
+  
+    public void move3(double x, double y, double turn, double offset) //Moves according to x y turn and offset
+    {
+    
+        double rawTheta = Math.atan2(y,x);
+        double theta = rawTheta - 1*Math.PI/4+2*offset;
+        
+        double leftFront = 0;
+        double rightFront = 0;
+        double leftRear = 0;
+        double rightRear = 0;
+        double sin = Math.sin(theta);
+        double cos = Math.cos(theta);
+        double max = Math.max(Math.abs(sin),Math.abs(cos));
+      
+        double power = - Math.sqrt(x*x+y*y);
+        
+        leftFront = power * sin/max + turn;
+        rightFront = power * cos/max - turn;
+        leftRear = power * cos/max + turn;
+        rightRear = power * sin/max - turn;
+        
+        if ((power + Math.abs(turn)) > 1) 
+        {
+          leftFront   /= power + Math.abs(turn);
+          rightFront /= power + Math.abs(turn);
+          leftRear    /= power + Math.abs(turn);
+          rightRear  /= power + Math.abs(turn);
+        }
+        frontLeftPower(leftFront*.7);
+        frontRightPower(rightFront*.7);
+        backLeftPower(leftRear*.7);
+        backRightPower(rightRear*.7);
+    }
+    
+    public void move4(double x, double y, double turn, double offset) //Moves according to x y turn and offset
+    {
+    
+        double rawTheta = Math.atan2(y,x);
+        double theta = rawTheta - 1*Math.PI/4+2*offset;
+        
+        double leftFront = 0;
+        double rightFront = 0;
+        double leftRear = 0;
+        double rightRear = 0;
+        double sin = Math.sin(theta);
+        double cos = Math.cos(theta);
+        double max = Math.max(Math.abs(sin),Math.abs(cos));
+      
+        double power = - Math.sqrt(x*x+y*y);
+        
+        leftFront = power * sin/max + turn;
+        rightFront = power * cos/max - turn;
+        leftRear = power * cos/max + turn;
+        rightRear = power * sin/max - turn;
+        
+        if ((power + Math.abs(turn)) > 1) 
+        {
+          leftFront   /= power + Math.abs(turn);
+          rightFront /= power + Math.abs(turn);
+          leftRear    /= power + Math.abs(turn);
+          rightRear  /= power + Math.abs(turn);
+        }
+        frontLeftPower(leftFront*.3);
+        frontRightPower(rightFront*.3);
+        backLeftPower(leftRear*.3);
+        backRightPower(rightRear*.3);
+    }
+    
+    public void allStop()
+    {
+      frontLeftPower(0);
+      frontRightPower(0);
+      backLeftPower(0);
+      backRightPower(0);
+    }
+  
+  
+//Direction Methods  
+    public void forward(double speed){
+      encoderModeOff();
+        move(0,-speed,0);
+    }
+    
+    public void backward(double speed){
+      encoderModeOff();
+        move(0,speed,0);
+    }
+    
+    public void strafeLeft(double speed){
+      encoderModeOff();
+      move(-speed,0,0);    
+    }
+    
+    public void strafeRight(double speed){
+      encoderModeOff();
+      move(speed,0,0);    
+    }
+    
+    
+//Directions with Measurements and Overloads    
+    public void forwardInches(double inches){
+      forwardInches(inches,true);
+    }
+    public void forwardInches(double inches,boolean wait){
+      int steps = (int) (inches * inchesToSteps);
+      forwardSteps(steps,stepPower);
+      if(wait){
+        while(areBusy()){};
+      }
+    }
+    
+    public void backwardInches(double inches){
+      backwardInches(inches, true);
+    }
+    public void backwardInches(double inches,boolean wait){
+      int steps = (int) (inches * inchesToSteps);
+      forwardInches(-inches);
+    }
+    
+    public void leftInches(double inches){
+      leftInches(inches,true);
+    }
+    public void leftInches(double inches,boolean wait){
+      int steps = (int) (inches * inchesToSteps);
+      leftSteps(-steps,stepPower);
+      if(wait){
+        while(areBusy()){};
+      }
+    }
+    
+    public void rightInches(double inches){
+      rightInches(inches,true);
+    }
+    public void rightInches(double inches,boolean wait){
+      int steps = (int) (inches * inchesToSteps);
+      leftSteps(steps,stepPower);
+      if(wait){
+        while(areBusy()){};
+      }
+      
+    }
+     
+    public void finish()
+    {
+      while(areBusy()){};
+    }
+ 
+    
+//Controls the inches methods 
+    public void forwardSteps(int motorSteps, double speed)
+    {
+      resetAllEncoders();
+      setTargetTo(motorSteps);
+      setRunToPosition();
+      setAllPower(speed);
+      //while(areBusy()){};
+    }
+    
+    public void leftSteps(int motorSteps, double speed)
+    {
+      resetAllEncoders();
+      setTargetToStrafe(motorSteps);
+      setRunToPosition();
+      setAllPower(speed);
+  //    while(areBusy()){};
+  //    encoderModeOff();
+    }  
+
+
+//Encoder Methods    
+    public void resetAllEncoders()
+    {
+      FrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+    public void setTargetTo(int stepPosition){
+      FrontLeft.setTargetPosition(stepPosition);
+      FrontRight.setTargetPosition(stepPosition);
+      backLeft.setTargetPosition(stepPosition);
+      backRight.setTargetPosition(stepPosition);
+    }
+    public void setRunToPosition(){
+      FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+    
+    public void setTargetToStrafe(int stepPosition){
+      FrontLeft.setTargetPosition(stepPosition);
+      FrontRight.setTargetPosition(-stepPosition);
+      backLeft.setTargetPosition(-stepPosition);
+      backRight.setTargetPosition(stepPosition);
+    }
+    
+    public void setAllPower(double speed){
+      frontLeftPower(speed);
+      frontRightPower(speed);
+      backLeftPower(speed);
+      backRightPower(speed);
+    }
+    
+    public void encoderModeOff(){
+      FrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      FrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    
+    
+//Rotation Methods
+    public void rotate(double speed){
+      encoderModeOff();
+      move(0,0,speed); 
+    }
+    
+    public void rotateRight(double speed){
+      rotate(speed);
+    }
+    
+    public void rotateLeft(double speed){
+      rotate(-speed);   
+    }
+    
+    public double getYaw(){
+      YawPitchRollAngles orientation;
+      orientation = imu.getRobotYawPitchRollAngles();
+      return orientation.getYaw(AngleUnit.DEGREES);
+    }
+    
+    public void rotateRightDegrees(int angle, double speed)
+    {
+      imu.resetYaw();
+      if(angle>180)
+      {
+        rotateLeftDegrees(angle-180,speed);
+      }
+      else 
+      {
+        double startYaw=getYaw();
+        while(getYaw()> startYaw - angle)
+        {
+          move(0,0,speed);
+        }
+          allStop();
+      }
+    }
+    
+    public void rotateLeftDegrees(int angle, double speed)
+    {
+      imu.resetYaw();
+      double startYaw=getYaw();
+      if(angle>180)
+      {
+        rotateRightDegrees(angle-180,speed);
+      }
+      else
+      {
+        while(getYaw()< startYaw + angle)
+        {
+          move(0,0,-speed);
+        }
+        allStop();
+      }
+    }
+    public double getFLpow()
+    {
+      return FrontLeft.getPower();
+    }
+    public double getFRpow()
+    {
+      return FrontRight.getPower();
+    }
+    public double getBLpow()
+    {
+      return backLeft.getPower();
+    }
+    public double getBRpow()
+    {
+      return backRight.getPower();
+    }
+//End of the entire file
+}
