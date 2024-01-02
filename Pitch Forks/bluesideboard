@@ -1,0 +1,424 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import java.util.concurrent.ExecutionException;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import com.qualcomm.robotcore.robot.Robot;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import java.util.List;
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.*;
+
+@Autonomous(name = "Blue-Side-Board, Auto")
+public class BoardBlueAuto extends LinearOpMode {
+        
+private IMU imu;
+  private Servo extenderServo;
+  private Servo lifterServo;
+  private Servo launcherServo;
+  
+  private DistanceSensor distanceAway;
+  private ColorSensor colorSensor;
+  private TouchSensor armMagnetC0;
+  DcMotor leftArm;
+  DcMotor rightArm;
+  Servo scoopRight;
+  Servo scoopLeft;
+  Servo door;
+  String currentColor = "";
+  Boolean isBlockSeen = false;
+  
+  
+  
+  YawPitchRollAngles orientation;
+  AngularVelocity angularVelocity;
+  /**
+   * This function is executed when this OpMode is selected from the Driver Station.
+   */
+  @Override
+  public void runOpMode() {
+   leftArm = hardwareMap.dcMotor.get("leftarm");
+   rightArm = hardwareMap.dcMotor.get("rightarm");
+   scoopRight = hardwareMap.get(Servo.class, "scoopright");
+   scoopLeft = hardwareMap.get(Servo.class, "scoopleft");
+   door = hardwareMap.get(Servo.class, "door");
+/* Servo Config  *********************************************  Servo Config */
+   // extenderServo = hardwareMap.get(Servo.class, "extenderServoC2");
+    lifterServo = hardwareMap.get(Servo.class, "mrleasetest");
+/* Sensor Config  *****************************************  Sensor Config */    
+    distanceAway = hardwareMap.get(DistanceSensor.class, "distanceForwardC1");
+    colorSensor = hardwareMap.get(ColorSensor.class, "colorDownC0");
+    
+    
+   
+/* Webcam Config androidTextToSpeech.initialize(); *********************************************  Webcam Config */    
+  
+  imu = hardwareMap.get(IMU.class, "imu");
+    
+waitForStart();
+    
+    if (opModeIsActive()) {
+      DriveMotors motors = new DriveMotors(hardwareMap,imu, this);
+       Arm arm = new Arm(hardwareMap);
+    //  PurplePixelPlacer ppp = new PurplePixelPlacer();
+      imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT)));
+        int propLocation = 0;
+        
+        
+        
+   //     try {
+   //     propLocation = ppp.findProp(1,motors,lifterServo, colorDown, distanceForward, this);
+   //    }
+   //    catch(InterruptedException e){}
+   //    catch(ExecutionException e){};
+   /*  
+       
+       switch(propLocation){
+        case 0:
+         motors.strafeRight(1);
+         break;
+        case 1:
+         motors.strafeRight(.5);
+         break;
+        case 2: 
+         motors.strafeRight(.25);
+         break;
+        case 3:
+         motors.strafeRight(.1);
+         break;
+       }
+     */
+     /*
+      motors.forward(.4);
+      sleep(500);
+      motors.allStop();
+      sleep(500);
+      motors.strafeRight(.4);
+      sleep(500);
+      motors.allStop();
+      sleep(500);
+      motors.backward(.4);
+      sleep(500);
+      motors.allStop();
+      sleep(500);
+      motors.strafeLeft(.4);
+      sleep(500);
+      motors.allStop();
+     
+     motors.rotateRightDegrees(15, .25);
+      sleep(500);
+      motors.rotateLeftDegrees(90, .25);
+      motors.allStop();
+      sleep(500);
+     
+      motors.rotateRight(1);
+      sleep(500);
+      motors.allStop();
+      sleep(500);
+      */
+      
+      /*
+      motors.backwardInches(12);
+      sleep(500);
+      motors.allStop();
+      motors.leftInches(12);
+      sleep(500);
+      motors.allStop();
+      sleep(500);
+      
+      arm.moveSteps(100, 1);
+      sleep(2000);
+      arm.moveSteps(100, .35);
+      sleep(2000);
+      arm.moveSteps(-200, 1);
+      sleep(1000);
+      */
+      //sajefhkauhdgilhaiouehgoiuahlfdghklajdgyIOWHEFLHAOIDGHOhwaleglashdogoag
+      
+      
+      
+      
+      //ilauergiuanhdkfjhviwngevnuiaudvgkasdgkjhajkegvuqwoegfoqwegoasoidgoiaweriofgwiqegfiouwgioegoiuedfgiuaidioguwofadflasdfkjgweeioqgiergilaslkdjhiuwareioghalfgeargaegasdfg
+      door.setPosition(0);
+      if(distanceAway.getDistance(DistanceUnit.CM) < 75)
+      {
+        motors.backwardInches(25);
+        while(currentColor.matches(""))
+        {
+          if(currentColor.matches(""))
+            {
+              goUntilColor();
+            }
+            if(currentColor.matches(""))
+            {
+              motors.backwardInches(2);
+            }
+        }
+        lifterServo.setPosition(1);
+        isBlockSeen= true;
+        sleep(1000);
+        motors.forwardInches(6);
+        motors.rotateLeftDegrees(90, .25);
+        motors.backwardInches(35);
+        //motors.leftInches(3);
+        motors.backwardInches(7);
+        arm.moveSteps(250, 1);
+          sleep(100);
+          openClaw();
+          motors.backwardInches(5);
+          door.setPosition(1);
+          sleep(1000);
+          motors.forwardInches(4);
+          motors.rightInches(22);
+          arm.moveSteps(-100, .5);
+          sleep(500);
+          arm.moveSteps(-150, .2);
+          sleep(500);
+          motors.backwardInches(14);
+          
+          
+        
+        
+      }if(!isBlockSeen)
+      {
+        motors.backwardInches(11);
+        motors.rightInches(10);
+        if(distanceAway.getDistance(DistanceUnit.CM) < 40)
+        {
+          motors.rightInches(15);
+          motors.backwardInches(22);
+          motors.rotateRightDegrees(90, .25);
+          motors.backwardInches(5);
+          while(currentColor.matches(""))
+          {
+            if(currentColor.matches(""))
+            {
+              goUntilColor();
+            }
+            if(currentColor.matches(""))
+            {
+              motors.backwardInches(2);
+            }
+          }
+          lifterServo.setPosition(1);
+          isBlockSeen= true;
+          sleep(1000);
+          motors.forwardInches(6);
+          motors.rotateRightDegrees(90, .25);
+          motors.rotateRightDegrees(85, .25);
+          sleep(50);
+          motors.rightInches(14);
+          motors.backwardInches(18);
+          arm.moveSteps(250, 1);
+          sleep(100);
+          openClaw();
+          motors.backwardInches(5);
+          door.setPosition(1);
+          sleep(1000);
+          motors.backwardInches(2);
+          
+        }else
+        {
+          motors.backwardInches(18);
+          motors.rotateRightDegrees(90, .25);
+          motors.backwardInches(14);
+          while(currentColor.matches(""))
+          {
+            if(currentColor.matches(""))
+            {
+              goUntilColor();
+            }
+            if(currentColor.matches(""))
+            {
+              motors.backwardInches(2);
+            }
+            
+            
+          }
+          lifterServo.setPosition(1);
+          isBlockSeen= true;
+          sleep(1000);
+          
+          motors.forwardInches(18);
+          motors.rotateRightDegrees(90, .25);
+          motors.rotateRightDegrees(85, .25);
+          motors.backwardInches(35);
+          arm.moveSteps(250, 1);
+          sleep(100);
+          openClaw();
+          motors.backwardInches(5);
+          door.setPosition(1);
+          sleep(1000);
+          motors.backwardInches(2);
+        
+          
+        }
+        
+        
+        
+      }
+      telemetry.addData("Distance", distanceAway.getDistance(DistanceUnit.CM));
+      telemetry.update();
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      /*
+      if(distanceAway.getDistance(DistanceUnit.CM) < 8)
+      {
+          while(currentColor.matches(""))
+          {
+              motors.rightInches(1.5);
+              goUntilColor();
+          }
+          lifterServo.setPosition(0);
+          
+      }else
+      {
+        
+      }
+      */
+      
+      
+      
+      
+      /*
+      motors.rotateLeftDegrees(90, .25);
+      sleep(100);
+      motors.backwardInches(41);
+      //downServo();
+      sleep(10);
+      arm.moveSteps(190, 1);
+      sleep(3000);
+      
+      killPower();
+      upServo();
+      sleep(500);
+      killPower();
+      arm.moveSteps(-230,1);
+      sleep(1000);
+      killPower();
+      motors.forwardInches(5);
+      sleep(100);
+      motors.allStop();
+      motors.rightInches(23);
+      sleep(10);
+      motors.allStop();
+      motors.backwardInches(14);
+      sleep(10);
+      motors.allStop();
+      upServo();
+      */
+      
+      telemetry.addData("Red", colorSensor.red());
+      telemetry.addData("Green", colorSensor.green());
+      telemetry.addData("Blue", colorSensor.blue());
+      telemetry.addData("Distance", distanceAway.getDistance(DistanceUnit.CM));
+      telemetry.update();
+      //sleep(15000);
+        
+      
+        
+       //motors.forwardInches(12);
+     //  motors.forwardInches(18); 
+       //motors.setStepPower(.75);
+       //motors.forwardInches(18); 
+       //motors.setStepPower(1);
+      // motors.forwardInches(18); 
+       //sleep(1000);
+       //motors.allStop(); 
+       //sleep(500);
+      /* motors.rotateLeft(.25); 
+       sleep(1000);
+       motors.allStop();
+       
+      */
+      
+    }
+  }
+  public void setArmPower(double power)
+  {
+    leftArm.setPower(power);
+    rightArm.setPower(power);
+  }
+  void killPower()
+  {
+    leftArm.setPower(0);
+    rightArm.setPower(0);
+  }
+  public void openClaw()
+  {
+   scoopRight.setPosition(1);
+   scoopLeft.setPosition(0);
+  }
+  public void downServo()
+  {
+   scoopRight.setPosition(0);
+   scoopLeft.setPosition(1);
+  }
+  void goUntilColor()
+  {
+    if(colorSensor.blue() > 130)
+      {
+        
+        currentColor = "blue";
+      }
+      if(colorSensor.blue() < 110)
+      {
+        currentColor = "";
+      }
+  }
+  void goUntilColorLeft()
+  {
+    if(colorSensor.blue() > 130)
+      {
+        currentColor = "blue";
+      }
+      if(colorSensor.blue() < 110)
+      {
+        currentColor = "";
+      }
+  }
+
+
+
+
+
+
+
+
+
+}
