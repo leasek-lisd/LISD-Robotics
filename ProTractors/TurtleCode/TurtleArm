@@ -67,4 +67,3 @@ public class arm
     clawServo.setPosition(.7);
   }
 }
-  
