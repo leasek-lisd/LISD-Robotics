@@ -1,0 +1,106 @@
+package org.firstinspires.ftc.teamcode;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import java.util.concurrent.ExecutionException;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import com.qualcomm.robotcore.robot.Robot;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import java.util.List;
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.*;
+
+// This is the name that will appear in the Driver Hub Menu
+@TeleOp(name = "James Mode")
+public class JamesMode extends LinearOpMode 
+{
+  private IMU imu;
+  /**
+   * This function is executed when this OpMode is selected from the Driver Station.
+   */
+  @Override
+  public void runOpMode() 
+  {
+    imu = hardwareMap.get(IMU.class, "imu");
+  /* Motor Config  **********************************************/    
+     DriveMotors motors = new DriveMotors(hardwareMap, imu, this);  // frontLeftDrive, frontRightDrive,backLeftDrive, backRightDrive);
+  /* Arm Config  **********************************************/
+    //arm arm = new arm(hardwareMap);
+  /* PixelPlacer Config  ******************************************/    
+    PurplePixelPlacer purplePixel = new PurplePixelPlacer(hardwareMap);  
+  /* Plane Config  ******************************************/    
+    Plane elytra = new Plane(hardwareMap);  
+  /* Webcam Config androidTextToSpeech.initialize(); *********************************************  Webcam Config */    
+      GreatArm greatArm = new GreatArm(hardwareMap);
+  /* Init Telemetry  *****************************************  Init Telemetry */
+    imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD)));
+   
+   // *****************************************  Moves on initilizaton  
+   // purplePixel.hammerUp();
+    
+    
+    waitForStart();
+    if (opModeIsActive())
+    {
+      // *****************************************  Start
+      while (opModeIsActive()) 
+      { 
+        // **********************************    Loop
+        
+//***** These run during the entire teleop section and are programmed to responed to input from sticks and triggers *****//
+        if(gamepad1.y)
+        {
+          greatArm.setLowerArmPower(gamepad1.right_stick_y);
+        }
+        else
+        {
+          greatArm.setUpperArmPower(gamepad1.right_stick_y);
+        }
+        
+        
+//***** Gunner Gamepad Controls *****//
+        if(gamepad1.a)
+        {
+          elytra.fire();
+        }
+        if(gamepad1.b)
+        {
+          elytra.reload();
+        }
+        
+//***** Driver Gamepad Controls *****//
+        motors.move2(gamepad1.left_stick_x,gamepad1.left_stick_y,gamepad1.right_stick_x,0);
+        //arm.spinToWin(Math.abs(gamepad1.left_stick_y));
+        if(Math.abs(gamepad1.left_stick_y) < .3)
+        {
+          //arm.spinToWin(gamepad1.right_trigger);
+        }
+//***** This is custom methods in each file to get telemetry *****//
+        //telemetry.addData("FLeft Pow", motors.getFLpow());
+        //telemetry.addData("BLeft Pow", motors.getFRpow());
+        //telemetry.addData("FRight Pow", motors.getBLpow());
+        //telemetry.addData("BRight Pow", motors.getBRpow());
+        //telemetry.addData("RightPin Pos", arm.getRightPin());
+        //telemetry.addData("LeftPin Pos", arm.getLeftPin());
+        //telemetry.addData("Distance: ", purplePixel.checkDistance());
+        telemetry.update();
+      }
+    }
+  }
+}

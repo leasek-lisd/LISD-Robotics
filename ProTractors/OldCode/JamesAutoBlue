@@ -1,0 +1,271 @@
+// package org.firstinspires.ftc.teamcode.AutoCode;
+// import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+// import com.qualcomm.robotcore.hardware.TouchSensor;
+// import com.qualcomm.robotcore.hardware.DcMotor;
+// import com.qualcomm.robotcore.hardware.Servo;
+// import com.qualcomm.robotcore.hardware.ColorSensor;
+// import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+// import com.qualcomm.robotcore.hardware.DistanceSensor;
+// import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+// import com.qualcomm.robotcore.hardware.DcMotor;
+// import com.qualcomm.robotcore.hardware.DcMotorSimple;
+// import com.qualcomm.robotcore.hardware.Servo;
+// import com.qualcomm.robotcore.hardware.ColorSensor;
+// import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+// 
+// 
+// @Autonomous 
+// public class JamesAutoBlue extends LinearOpMode 
+// {
+//   private DcMotor FrontRight;
+//   private DcMotor backRight;
+//   private DcMotor FrontLeft;
+//   private DcMotor backLeft;
+//   private DcMotor lift;
+//   private DcMotor pully;
+//   private Servo hammer;
+//   private DistanceSensor dsensor;
+//   //private ColorSensor csensor;
+//   private Servo claw;
+//   private Servo purple;
+//   
+//    public void runOpMode() 
+//    {
+//     // Should be under public void runOpMode()
+//     FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeftC0"); 
+//     FrontRight = hardwareMap.get(DcMotor.class, "FrontRightC1");
+//     backLeft = hardwareMap.get(DcMotor.class, "backLeftC2");
+//     backRight = hardwareMap.get(DcMotor.class, "backRightC3");
+//     purple = hardwareMap.get(Servo.class, "purpleServoE2");
+//     dsensor = hardwareMap.get(DistanceSensor.class, "DistanceSensorE120");
+//     //csensor = hardwareMap.get(ColorSensor.class, "colorSensorE121");
+//     lift = hardwareMap.get(DcMotor.class, "liftMotorE0");
+//     pully = hardwareMap.get(DcMotor.class, "pullyMotorE1");
+//     //tsensor = hardwareMap.get(TouchSensor.class, "touchCD1");
+//     claw = hardwareMap.get(Servo.class, "clawServoE3");
+//     
+//     /// Reverses the back 2 motors to allow all the methods to work properly
+//     backRight.setDirection(DcMotor.Direction.REVERSE);
+//     backLeft.setDirection(DcMotor.Direction.REVERSE);
+//     claw.setPosition(1);
+//     
+//         waitForStart();
+//         if (opModeIsActive()) 
+//         {
+//             /// Note: Set the left motors to .9 power to balance out the hardware issues NULLED
+//             /// Note: 550 is the magic # for right turning 90 degrees
+//             /// Note: Use chillout() to create a pause between methods. It can be adjusted.
+//             /// Note: 1.35 Miliimeters of motion per tick. NULLED
+//             /// All of the methods you all go here
+//             
+//             slideLeft(500); //I NEED TO FIX SLIDE LEFT...Power issues???
+//             chillout();
+//            // moveX(450);
+//           //  chillout();
+//             if(dsensor.getDistance(DistanceUnit.INCH) < 6)
+//             {
+//                 slideLeft(-450);
+//                 chillout();
+//                 moveX(200);
+//                 chillout();
+//                 purple.setPosition(1);
+//                 chillout();
+//                 //Include Parking code here
+//                 moveX(-200);
+//                 chillout();
+//                 rotateLeft(450);
+//                 chillout();
+//                 moveX(800);
+//                 chillout();
+//                 claw.setPosition(0.7);
+//                 chillout();
+//                 slideLeft(400);
+//             }
+//             else
+//             {
+//              //   slideLeft(-350);
+//             //    chillout();
+//              //   moveX(325);
+//              //   chillout();
+//                 if(dsensor.getDistance(DistanceUnit.INCH) < 6)
+//                 {
+//                     slideLeft(-375);
+//                     chillout();
+//                     moveX(50);
+//                     chillout();
+//                     purple.setPosition(1);
+//                     chillout();
+//                     //Include parking code here
+//                     moveX(-200);
+//                     chillout();
+//                     rotateLeft(450);
+//                     chillout();
+//                     moveX(950);
+//                     chillout();
+//                     claw.setPosition(0.7);
+//                     chillout();
+//                     chillout();
+//                     slideLeft(600);
+//                 }
+//                 else
+//                 {
+//              //     moveX(-125);
+//              //     chillout();
+//              //      slideLeft(-800);
+//              //       chillout();
+//               //      purple.setPosition(1);
+//                     chillout();
+//                     //Include parking code here
+//                     //moveX(700);
+//                     chillout();
+//                     //rotateLeft(450);
+//                     chillout();
+//                     //moveX(1500);
+//                     chillout();
+//                     //slideLeft(300);
+//                     chillout();
+//                     //claw.setPosition(0.7);
+//                     chillout();
+//                     //slideLeft(700);
+//                 }
+//             }
+//         }
+//         while (opModeIsActive()) 
+//         {
+//                 /// This section goes after the commands end and displays data on the driver hub
+//                 telemetry.addData("FLeft Pow", FrontLeft.getPower());
+//                 telemetry.addData("BLeft Pow", FrontLeft.getPower());
+//                 telemetry.addData("FRight Pow", FrontLeft.getPower());
+//                 telemetry.addData("BRight Pow", FrontLeft.getPower());
+//                 double value = dsensor.getDistance(DistanceUnit.INCH); 
+//                 telemetry.addData("Distance: ", value);
+//                 telemetry.update();
+//                 
+//         }
+//    }
+//     
+//         /// All the methods you can call during autonomus
+//         public void fixIt(double directions)
+//         {
+//             FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//             FrontRight.setPower(directions);
+//             sleep(500);
+//             FrontRight.setPower(0);
+//             
+//         }
+//         public void chillout()
+//         {
+//           sleep(500);
+//         }
+//         public void moveUp(int time){
+//             FrontLeft.setPower(.5);
+//             FrontRight.setPower(.5);
+//             backLeft.setPower(.5);
+//             backRight.setPower(.5);
+//             sleep(time);
+//             FrontLeft.setPower(0);
+//             FrontRight.setPower(0);
+//             backLeft.setPower(0);
+//             backRight.setPower(0);
+//             
+//         }
+//         public void touchAndGoLeft()
+//         {
+//             FrontLeft.setPower(-1);
+//             FrontRight.setPower(1);
+//             backLeft.setPower(1);
+//             backRight.setPower(-1);
+//         }
+//         public void touchAndGoRight()
+//         {
+//             FrontLeft.setPower(1);
+//             FrontRight.setPower(-1);
+//             backLeft.setPower(-1);
+//             backRight.setPower(1);
+//         }
+//         public void touchAndGoBack()
+//         {
+//             FrontLeft.setPower(1);
+//             FrontRight.setPower(1);
+//             backLeft.setPower(1);
+//             backRight.setPower(1);
+//         }
+//         public void moveX(int knots)
+//         {
+//             FrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//             FrontLeft.setTargetPosition(knots);FrontRight.setTargetPosition(knots);backLeft.setTargetPosition(knots);backRight.setTargetPosition(knots);
+//             FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//             FrontLeft.setPower(.5);
+//             FrontRight.setPower(.5);
+//             backLeft.setPower(.5);
+//             backRight.setPower(.5);
+//             while(FrontLeft.isBusy() && FrontRight.isBusy() && backLeft.isBusy() && backRight.isBusy() && opModeIsActive())
+//             {//DO NOT PUT ANYTHING IN HERE
+//             }
+//             FrontLeft.setPower(0);FrontRight.setPower(0);backLeft.setPower(0);backRight.setPower(0);
+//         }
+//         
+//         public void rotateRight(int knots)
+//         {
+//             FrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//             FrontLeft.setTargetPosition(knots);FrontRight.setTargetPosition(-knots);backLeft.setTargetPosition(knots);backRight.setTargetPosition(-knots);
+//             FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//             FrontLeft.setPower(1);
+//             FrontRight.setPower(-1);
+//             backLeft.setPower(1);
+//             backRight.setPower(-1);
+//             while(FrontLeft.isBusy() && FrontRight.isBusy() && backLeft.isBusy() && backRight.isBusy() && opModeIsActive())
+//             {//DO NOT PUT ANYTHING IN HERE
+//             }
+//             FrontLeft.setPower(0);FrontRight.setPower(0);backLeft.setPower(0);backRight.setPower(0);
+//         }
+//         
+//         public void rotateLeft(int knots)
+//         {
+//             FrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//             FrontLeft.setTargetPosition(-knots);FrontRight.setTargetPosition(knots);backLeft.setTargetPosition(-knots);backRight.setTargetPosition(knots);
+//             FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//             FrontLeft.setPower(-1);
+//             FrontRight.setPower(1);
+//             backLeft.setPower(-1);
+//             backRight.setPower(1);
+//             while(FrontLeft.isBusy() && FrontRight.isBusy() && backLeft.isBusy() && backRight.isBusy() && opModeIsActive())
+//             {//DO NOT PUT ANYTHING IN HERE
+//             }
+//             FrontLeft.setPower(0);FrontRight.setPower(0);backLeft.setPower(0);backRight.setPower(0);
+//         }
+//         
+//         public void slideRight(int knots)
+//         {
+//             FrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//             FrontLeft.setTargetPosition(knots);FrontRight.setTargetPosition(knots);backLeft.setTargetPosition(knots);backRight.setTargetPosition(knots);
+//             FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//             FrontLeft.setPower(1);
+//             FrontRight.setPower(-1);
+//             backLeft.setPower(-1);
+//             backRight.setPower(1);
+//             while(FrontLeft.isBusy() && FrontRight.isBusy() && backLeft.isBusy() && backRight.isBusy() && opModeIsActive())
+//             {//DO NOT PUT ANYTHING IN HERE
+//             }
+//             FrontLeft.setPower(0);FrontRight.setPower(0);backLeft.setPower(0);backRight.setPower(0);
+//         }
+//         
+//         public void slideLeft(int knots)
+//         {
+//             FrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//             FrontLeft.setTargetPosition(-knots);FrontRight.setTargetPosition(knots);backLeft.setTargetPosition(knots);backRight.setTargetPosition(-knots);
+//             FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//             FrontLeft.setPower(-.5);
+//             FrontRight.setPower(.7);
+//             backLeft.setPower(.5);
+//             backRight.setPower(-.5);
+//             while(FrontLeft.isBusy() && FrontRight.isBusy() && backLeft.isBusy() && backRight.isBusy() && opModeIsActive())
+//             {//DO NOT PUT ANYTHING IN HERE
+//             }
+//             FrontLeft.setPower(0);FrontRight.setPower(0);backLeft.setPower(0);backRight.setPower(0);
+//         }
+// }
+// 
+//         
+// 
+// 
