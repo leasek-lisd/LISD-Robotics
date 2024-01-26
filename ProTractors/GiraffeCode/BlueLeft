@@ -1,0 +1,117 @@
+package org.firstinspires.ftc.teamcode;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import java.util.concurrent.ExecutionException;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.robot.Robot;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import java.util.List;
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.*;
+
+@Autonomous(name = "Left Blue")
+public class BlueLeftAuto extends LinearOpMode 
+{
+  //Initialize
+  private IMU imu;
+  String currentColor = "";
+  Boolean isBlockSeen = false;
+  YawPitchRollAngles orientation;
+  AngularVelocity angularVelocity;
+  private Servo purple;
+  
+@Override
+public void runOpMode() 
+{
+  //Configurations 
+  imu = hardwareMap.get(IMU.class, "imu");
+  purple = hardwareMap.get(Servo.class, "hammerE1");
+  purple.setPosition(0.3); 
+  waitForStart();
+    
+  if (opModeIsActive()) 
+  {
+    //Variables and Objects Init
+    DriveMotors motors = new DriveMotors(hardwareMap,imu, this);
+    arm arm = new arm(hardwareMap);
+    PurplePixelPlacer ppp = new PurplePixelPlacer(hardwareMap);
+    imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT)));
+    int propLocation = 0;
+    
+//START OF CODE.
+  double distanceData = 0;
+  int pathFinder = 0;
+    arm.bucketUp();
+    //arm.holding(2);
+      if(ppp.checkDistance() < 25)
+      {
+        pathFinder = 2;
+        sleep(500);
+      }
+      else
+      {
+        sleep(500);
+        motors.leftInches(10);
+        sleep(500);
+        if(ppp.checkDistance() < 25)
+        {
+          pathFinder = 1;
+          sleep(500);
+        }
+        else
+        {
+          pathFinder = 3;
+          sleep(500);
+        }
+      }
+      motors.leftInches(-10);
+      sleep(500);
+      motors.forwardInches(-4);
+      sleep(500);
+      motors.rotateRightDegrees(80, .5);
+      sleep(500);
+      motors.rotateRightDegrees(80, .5);
+      sleep(500);
+      //Spin Right Round and Prep for Pathways
+      if(pathFinder == 2)
+      {
+        motors.forwardInches(16);
+        ppp.hammerUp();
+        motors.leftInches(30);
+        motors.forwardInches(10);
+      }
+      if(pathFinder == 1)
+      {
+        
+      }
+      if(pathFinder == 3)
+      {
+        
+      }
+     // //motors.forwardInches(30);
+      telemetry.addData("Prop Location: ", pathFinder);
+      telemetry.addData("Distance Checked: ", distanceData);
+      telemetry.update();
+      sleep(10000);
+   
+  }
+}
+//END OF CODE.
+}

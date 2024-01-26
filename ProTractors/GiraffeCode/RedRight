@@ -1,0 +1,163 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import java.util.concurrent.ExecutionException;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import com.qualcomm.robotcore.robot.Robot;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import java.util.List;
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.*;
+
+@Autonomous(name = "Red Right")
+public class RedRightAuto extends LinearOpMode 
+{
+  //Initialize
+  private IMU imu;
+  String currentColor = "";
+  Boolean isBlockSeen = false;
+  YawPitchRollAngles orientation;
+  AngularVelocity angularVelocity;
+  private Servo purple;
+  
+@Override
+public void runOpMode() 
+{
+  //Configurations 
+  imu = hardwareMap.get(IMU.class, "imu");
+  purple = hardwareMap.get(Servo.class, "hammerE1");
+  purple.setPosition(0.3); 
+waitForStart();
+    
+  if (opModeIsActive()) 
+  {
+    //Variables and Objects Init
+    DriveMotors motors = new DriveMotors(hardwareMap,imu, this);
+    arm arm = new arm(hardwareMap);
+    PurplePixelPlacer ppp = new PurplePixelPlacer(hardwareMap);
+    imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT)));
+    int propLocation = 0;
+    
+//START OF CODE.
+
+String data = " ";
+double distanceData = 0;
+      if(ppp.checkDistance() < 25)
+      {
+        distanceData= ppp.checkDistance();
+        sleep(500);
+        data = "Place 2";
+        sleep(200);
+        motors.leftInches(4);
+        sleep(200);
+        motors.backwardInches(28);
+        sleep(200);
+        //motors.rotateRightDegrees(179, 0.5);
+        sleep(900);
+        //motors.rotateRightDegrees(90, 0.5);
+        //sleep(900);
+        purple.setPosition(0);
+        sleep(1400);
+        motors.leftInches(30);
+        sleep(200);
+      }
+      else
+      {
+        motors.leftInches(10);
+        if(ppp.checkDistance() < 25)
+        {
+          distanceData= ppp.checkDistance();
+          sleep(500);
+          data = "Place 3";
+          motors.leftInches(6);
+          motors.backwardInches(22);
+          sleep(100);
+          //motors.forwardInches(-8);
+          sleep(100);
+          purple.setPosition(0);
+          sleep(500);
+          motors.leftInches(15);
+          sleep(100);
+          
+        }
+        else
+        {
+          distanceData= ppp.checkDistance();
+          sleep(500);
+          data = "Place 1 by elimination";
+          motors.backwardInches(22);
+          sleep(100);
+          motors.leftInches(-14);
+          sleep(100);
+          purple.setPosition(0);
+          sleep(500);
+          motors.leftInches(36);
+          sleep(100);
+          
+        }
+      }
+      motors.forwardInches(30);
+      telemetry.addData("Prop Location: ", data);
+      telemetry.addData("Distance Checked: ", distanceData);
+      telemetry.update();
+      sleep(10000);
+   
+  }
+}
+
+
+//COLOR METHODS COLOR METHODS COLOR METHODS
+  void goUntilColor()
+  {
+    PurplePixelPlacer ppp = new PurplePixelPlacer(hardwareMap);
+    if(ppp.checkRed() > 130)
+      {
+        
+        currentColor = "red";
+      }
+      if(ppp.checkRed() < 110)
+      {
+        currentColor = "";
+      }
+  }
+  
+  void goUntilColorLeft()
+  {
+    PurplePixelPlacer ppp = new PurplePixelPlacer(hardwareMap);
+    if(ppp.checkRed() > 130)
+      {
+        currentColor = "red";
+      }
+      if(ppp.checkRed() < 110)
+      {
+        currentColor = "";
+      }
+  }
+  public void halt()
+  {
+    while(opModeIsActive())
+    {
+      sleep(100);
+    }
+  }
+//END OF CODE.
+}
